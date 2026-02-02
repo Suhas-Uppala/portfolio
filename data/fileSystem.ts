@@ -20,19 +20,23 @@ export const fileSystem: FileNode = {
 Name: Suhas Uppala
 Location: Hyderabad, Telangana
 Email: suhasuppala1805@gmail.com
-Phone: +91-7989665270
+Phone: +91-79896 65270
 
-I'm an AI/ML Enthusiast and Full-Stack Developer with a passion for 
-building intelligent applications that solve real-world problems.
+I'm an AI/ML Enthusiast and Full-Stack Developer pursuing 
+B.Tech in Computer Science & Engineering (AIML) at 
+VNR Vignana Jyothi Institute of Engineering and Technology.
 
 My expertise spans:
 • Machine Learning & Deep Learning
 • Computer Vision & NLP
-• Full-Stack Web Development
-• Cloud Architecture & DevOps
+• Full-Stack Web Development (MERN, Flask, FastAPI)
+• Data Visualization & Analytics
 
-Currently focused on developing scalable AI solutions and 
-contributing to open-source projects.`
+Currently focused on developing AI-powered solutions and 
+contributing to hackathons and open-source projects.
+
+Winner of GDGC Solution Challenge 2025 and 
+Finalist at Smart India Hackathon 2024 & 2025.`
     },
     {
       name: 'education.txt',
@@ -40,17 +44,23 @@ contributing to open-source projects.`
       path: '/education.txt',
       content: `=== EDUCATION ===
 
-[2021 - 2025]
-Bachelor of Technology in Computer Science
-KESHAV MEMORIAL INSTITUTE OF TECHNOLOGY, Hyderabad
-• CGPA: 8.5/10
+[2022 - 2026]
+B.Tech. in Computer Science and Engineering (AIML)
+VNR VIGNANA JYOTHI INSTITUTE OF ENGINEERING AND TECHNOLOGY
+• CGPA: 8.45/10
 • Relevant Coursework: Machine Learning, Data Structures,
-  Algorithms, Database Systems, Cloud Computing
+  Algorithms, Database Systems, AI/ML
 
-[2019 - 2021]
+[2020 - 2022]
 Intermediate (12th Grade)
-• Mathematics, Physics, Chemistry
-• Percentage: 95%`
+SRI CHAITANYA JUNIOR COLLEGE, Telangana
+• Percentage: 95.8%
+• Stream: MPC (Mathematics, Physics, Chemistry)
+
+[2019 - 2020]
+High School (10th Grade)
+SRI CHAITANYA TECHNO SCHOOL, Telangana
+• CGPA: 10.00/10`
     },
     {
       name: 'experience.txt',
@@ -58,19 +68,26 @@ Intermediate (12th Grade)
       path: '/experience.txt',
       content: `=== EXPERIENCE ===
 
-[Jun 2024 - Present]
-Machine Learning Engineer Intern
-TECH STARTUP, Remote
-• Developed ML models for predictive analytics
-• Improved model accuracy by 25% using ensemble methods
-• Built REST APIs for model deployment
-
-[Jan 2024 - May 2024]
+[Oct 2024 - Dec 2024]
 Full Stack Developer Intern
-SOFTWARE COMPANY, Hyderabad
-• Built responsive web applications using React/Next.js
-• Implemented authentication & authorization systems
-• Optimized database queries for better performance`
+BIO CLINPHARM PVT LTD
+• Worked on company website focusing on functionality, 
+  user experience, and data handling
+• Strengthened full stack development skills
+• Gained hands-on exposure to real-world applications
+
+[2024 - Present]
+Superior Non-Technical Head
+CSI STUDENT CHAPTER, VNR VJIET
+• Led non-technical operations for 1000+ members
+• Coordinating events and managing cross-team collaboration
+
+[2024 - Present]
+Superior Design Head
+KRITHOMEDH (AIML CLUB)
+• Managed design and branding for 300+ member AIML club
+• Supporting events and technical activities through 
+  visual communication`
     },
     {
       name: 'skills.txt',
@@ -79,26 +96,35 @@ SOFTWARE COMPANY, Hyderabad
       content: `=== TECHNICAL SKILLS ===
 
 [Programming Languages]
-Python    ████████████████████ 95%
-JavaScript/TypeScript ████████████████░░░░ 85%
-Java      ████████████░░░░░░░░ 70%
-C++       ██████████░░░░░░░░░░ 60%
+Python        ████████████████████ 95%
+JavaScript    ████████████████░░░░ 85%
+C/C++         ████████████████░░░░ 80%
+SQL           ████████████████░░░░ 80%
 
 [Frameworks & Libraries]
-TensorFlow, PyTorch, Keras
-React, Next.js, Node.js
-Express, FastAPI, Flask
+Flask, FastAPI, MERN Stack
+Flutter, Streamlit
+TensorFlow, Scikit-learn
+OpenCV, LangChain
+
+[Data Visualization]
+Power BI, Tableau, R Studio
+
+[Databases]
+MySQL, MongoDB, SQLite, PostgreSQL
 
 [Tools & Platforms]
-Git, Docker, Kubernetes
-AWS, GCP, Vercel
-PostgreSQL, MongoDB, Redis
+Git, GitHub, Docker
+Power BI, Twilio
+
+[Operating Systems]
+Windows, Linux
 
 [AI/ML Specializations]
-• Computer Vision
-• Natural Language Processing
-• Deep Learning
-• Reinforcement Learning`
+• Computer Vision (OpenCV)
+• Deep Learning (TensorFlow)
+• RAG & GenAI (LangChain, Gemini)
+• Machine Learning (Scikit-learn)`
     },
     {
       name: 'contact.txt',
@@ -107,15 +133,13 @@ PostgreSQL, MongoDB, Redis
       content: `=== CONTACT INFORMATION ===
 
 📧 Email: suhasuppala1805@gmail.com
-📱 Phone: +91-7989665270
+📱 Phone: +91-79896 65270
 📍 Location: Hyderabad, Telangana, India
 
 🔗 LINKS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-GitHub      : github.com/suhasuppala
-LinkedIn    : linkedin.com/in/suhasuppala
-Portfolio   : suhasuppala.dev
-Twitter     : twitter.com/suhasuppala
+GitHub      : github.com/suhas-uppala
+LinkedIn    : linkedin.com/in/Suhas-Uppala
 
 Feel free to reach out for collaborations, 
 opportunities, or just a chat about tech!`
@@ -126,107 +150,162 @@ opportunities, or just a chat about tech!`
       path: '/projects',
       children: [
         {
-          name: 'water-quality.txt',
+          name: 'optideliver.txt',
           type: 'file',
-          path: '/projects/water-quality.txt',
-          content: `=== WATER QUALITY ANALYSIS ===
+          path: '/projects/optideliver.txt',
+          content: `=== OPTIDELIVER - AI DELIVERY OPTIMIZATION SYSTEM ===
 
-A machine learning system for predicting water potability
-using various physicochemical parameters.
+An AI-powered logistics solution for India Post that optimizes 
+delivery routes and time slots for 1,000+ daily shipments.
 
 [Technologies]
-• Python, Scikit-learn, Pandas
-• TensorFlow for deep learning models
-• Flask for API deployment
-• Docker for containerization
+• TensorFlow, Scikit-learn
+• Twilio, Flask, React.js
+• MongoDB
 
 [Features]
-• Multi-parameter water quality assessment
-• Real-time prediction API
-• Interactive visualization dashboard
-• 94% accuracy on test dataset
+• Optimizes delivery routes and time slots
+• Reduces delivery times and fuel consumption
+• React-based sender interface for order creation
+• Live tracking and delivery status notifications
+• Twilio SMS alerts integration
+• Scalable backend services for seamless delivery tracking
 
 [Links]
-GitHub: github.com/suhasuppala/water-quality
-Demo: water-quality.vercel.app`
+GitHub: github.com/suhas-uppala/optideliver`
         },
         {
-          name: 'violence-detection.txt',
+          name: 'sportai.txt',
           type: 'file',
-          path: '/projects/violence-detection.txt',
-          content: `=== VIOLENCE DETECTION SYSTEM ===
+          path: '/projects/sportai.txt',
+          content: `=== SPORTAI - AI ATHLETE MANAGEMENT PLATFORM ===
 
-Deep learning-based real-time violence detection 
-in video surveillance feeds.
+Winner of GDGC Solution Challenge 2025!
+Real-time motion and biometric analysis platform for athletes.
 
 [Technologies]
-• Python, PyTorch, OpenCV
-• LSTM + CNN Architecture
-• FastAPI for backend
-• React for dashboard
+• Flutter, OpenCV, RAG
+• Scikit-learn, PostgreSQL, GenAI
+• FastAPI, LangChain, Gemini API
 
 [Features]
-• Real-time video analysis
-• Alert notification system
-• 97% detection accuracy
-• Low latency processing (<100ms)
+• Real-time motion and biometric analysis
+• ML-based injury risk detection models
+• Fatigue and strain signals analysis for proactive injury prevention
+• AI-driven coaching insights
+• Personalized training plans and recovery suggestions
+
+[Awards]
+🏆 Winner, GDGC Solution Challenge 2025
 
 [Links]
-GitHub: github.com/suhasuppala/violence-detection
-Paper: arxiv.org/...`
+GitHub: github.com/suhas-uppala/sportai`
         },
         {
-          name: 'portfolio.txt',
+          name: 'books-hub.txt',
           type: 'file',
-          path: '/projects/portfolio.txt',
-          content: `=== TERMINAL PORTFOLIO ===
+          path: '/projects/books-hub.txt',
+          content: `=== BOOKS HUB - LIBRARY MANAGER ===
 
-A unique terminal-themed portfolio website with 
-interactive file system navigation.
+A full-stack digital library system for book cataloging, 
+borrowing, and returns through a clean web interface.
 
 [Technologies]
-• Next.js 14, TypeScript
-• Tailwind CSS
-• Framer Motion animations
-• Lucide React icons
+• MERN Stack (MongoDB, Express.js, React.js, Node.js)
 
 [Features]
-• Terminal emulator with commands
-• File tree navigation
-• Resizable split panels
-• Animated backgrounds
-• Fully responsive design
+• Book cataloging, borrowing, and returns management
+• Clean and intuitive web interface
+• Role-based authentication (RBAC)
+• User data and control access for librarians and readers
+• Responsive, scalable UI/UX
+• Seamless usage across devices
+• Future feature extensions support
 
 [Links]
-Live: suhasuppala.dev
-GitHub: github.com/suhasuppala/portfolio`
+GitHub: github.com/suhas-uppala/books-hub`
         },
         {
-          name: 'chatbot.txt',
+          name: 'anomaly-detection.txt',
           type: 'file',
-          path: '/projects/chatbot.txt',
-          content: `=== AI CHATBOT ===
+          path: '/projects/anomaly-detection.txt',
+          content: `=== ANOMALY DETECTION IN CCTV FOOTAGE ===
 
-An intelligent conversational AI powered by 
-large language models.
+Deep learning-based system to analyze CCTV footage 
+and flag suspicious activity in real-time.
 
 [Technologies]
-• Python, LangChain
-• OpenAI GPT API
-• Vector databases (Pinecone)
-• Streamlit for UI
+• TensorFlow, Flask, OpenCV
+• Twilio, Geolocator, Scikit-learn
 
 [Features]
-• Context-aware conversations
-• Document Q&A capability
-• Multi-language support
-• Custom knowledge base integration
+• LRCN-based deep learning system
+• Real-time CCTV footage analysis
+• Flask-based interface and REST APIs
+• Upload footage, run inference, view anomaly reports
+• Twilio alerts for incident notifications
+• Date-wise anomaly logs for streamlined monitoring
 
 [Links]
-GitHub: github.com/suhasuppala/ai-chatbot
-Demo: chatbot.suhasuppala.dev`
+GitHub: github.com/suhas-uppala/anomaly-detection`
+        },
+        {
+          name: 'postal-logistics-research.txt',
+          type: 'file',
+          path: '/projects/postal-logistics-research.txt',
+          content: `=== AI-POWERED POSTAL LOGISTICS RESEARCH ===
+
+Research project: Optimizing Deliveries with Customized Time Slots
+
+[Technologies]
+• Random Forest, XGBoost
+• KMeans++ Clustering
+• Google Maps API
+
+[Research Contributions]
+• Analyzed supervised ML models to predict optimal delivery 
+  time slots and increase successful deliveries
+• Applied KMeans++ clustering and Google Maps API for 
+  dynamic route optimization
+• Enabled efficient courier assignment and reduced travel distance
+• Integrated real-world delivery and traffic data
+• Quantified time and fuel savings while improving customer experience
+
+[Status]
+📝 Active Research Work`
         }
       ]
+    },
+    {
+      name: 'achievements.txt',
+      type: 'file',
+      path: '/achievements.txt',
+      content: `=== ACHIEVEMENTS ===
+
+🏆 [2025] Winner, GDGC Solution Challenge
+   Developed SportAI using RAG, ML, OpenCV, and Flutter
+
+🥈 [2024] 2nd Place, Project Expo at Convergence
+   AI-powered solution with strong real-world impact
+
+🥉 [2023] 3rd Place, VJ Hackathon
+   Innovative AI-driven solution
+
+🏅 [2024] 3rd Position, NxtWave Coding Challenge
+   Among 3,000 participants
+
+📜 [2024] Consolation Prize, Paper Presentation
+   Convergence - Impactful research contribution
+
+⭐ [2024] Finalist, Smart India Hackathon
+   Top 2.4% among 13,000+ participants
+   Ministry of Communication problem statement
+
+⭐ [2025] Finalist, Smart India Hackathon
+   Selected among national finalists for ministry-level problem
+
+🎓 [2024 & 2025] Amazon ML Summer School
+   Selected for advanced exposure to applied ML and industry practices`
     },
     {
       name: 'certifications.txt',
@@ -234,20 +313,26 @@ Demo: chatbot.suhasuppala.dev`
       path: '/certifications.txt',
       content: `=== CERTIFICATIONS ===
 
-[2024] AWS Certified Machine Learning - Specialty
-       Amazon Web Services
+[2025] Oracle OCI 2025 Certified AI Foundations Associate
+       Oracle
 
-[2024] TensorFlow Developer Certificate
-       Google
+[2025] Amazon ML Summer School 2025
+       Amazon
 
-[2023] Deep Learning Specialization
-       Coursera (DeepLearning.AI)
+[2024] Introduction to IoT - NPTEL
+       Score: 85%
 
-[2023] Full Stack Web Development
-       Udemy
+[2024] Tableau Certification
+       Internshala
 
-[2022] Python for Data Science
-       IBM`
+[2024] Python Certification
+       NxtWave
+
+[2024] Introduction to Databases
+       NxtWave
+
+[2024] Developer Foundations
+       NxtWave`
     },
     {
       name: 'README.md',
@@ -266,17 +351,20 @@ Use terminal commands to explore:
   clear       - Clear terminal
   help        - Show all commands
 
-## About This Portfolio
+## About Me
 
-This is an interactive terminal-themed portfolio.
-Navigate through my projects, skills, and experience
-using familiar command-line interfaces.
+I'm Suhas Uppala, an AI/ML Enthusiast and Full-Stack Developer
+pursuing B.Tech in CSE (AIML) at VNR VJIET, Hyderabad.
+
+🏆 Winner - GDGC Solution Challenge 2025
+⭐ Finalist - Smart India Hackathon 2024 & 2025
+🎓 Amazon ML Summer School 2024 & 2025
 
 ## Contact
 
 Email: suhasuppala1805@gmail.com
-LinkedIn: linkedin.com/in/suhasuppala
-GitHub: github.com/suhasuppala
+LinkedIn: linkedin.com/in/Suhas-Uppala
+GitHub: github.com/suhas-uppala
 
 ---
 Built with ❤️ using Next.js & TypeScript`

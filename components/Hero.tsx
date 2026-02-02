@@ -35,7 +35,7 @@ export default function Hero({ onViewMore }: HeroProps) {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.6 }}
           >
-            Hyderabad, Telangana — +91-7989665270 · suhasuppala1805@gmail.com
+            Hyderabad, Telangana — +91-79896 65270 · suhasuppala1805@gmail.com
           </motion.p>
 
           <motion.div

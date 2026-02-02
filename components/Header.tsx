@@ -88,7 +88,7 @@ export default function Header({ currentView, onExploreProjects, onGoHome }: Hea
             <div className="flex items-center gap-3">
               {/* GitHub */}
               <a
-                href="https://github.com/suhasuppala"
+                href="https://github.com/suhas-uppala"
                 target="_blank"
                 rel="noreferrer"
                 className="group relative"
@@ -103,7 +103,7 @@ export default function Header({ currentView, onExploreProjects, onGoHome }: Hea
               
               {/* LinkedIn */}
               <a
-                href="https://linkedin.com/in/suhasuppala"
+                href="https://linkedin.com/in/Suhas-Uppala"
                 target="_blank"
                 rel="noreferrer"
                 className="group relative"
