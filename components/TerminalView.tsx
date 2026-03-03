@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, FormEvent, MouseEvent } from 'react';
+import { useState, useRef, useEffect, FormEvent, MouseEvent, Fragment } from 'react';
 import { fileSystem, FileNode, findNode, getParentPath } from '@/data/fileSystem';
 import FileTree from './FileTree';
 import TerminalShell from './TerminalShell';
@@ -81,7 +81,7 @@ interface TerminalViewProps {
 export default function TerminalView({ onGoHome }: TerminalViewProps) {
   const [cwd, setCwd] = useState('/');
   const [output, setOutput] = useState<string[]>([
-    "Welcome to Suhas's portfolio terminal.",
+    `Welcome to ${process.env.NEXT_PUBLIC_NAME?.split(' ')[0]}'s portfolio terminal.`,
     "Type 'help' to see available commands.",
     "",
   ]);
@@ -341,16 +341,16 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
     return lines;
   };
 
-  const pwdCommand = (): string[] => [cwd === '/' ? '/Suhas Uppala' : `/Suhas Uppala${cwd}`];
+  const pwdCommand = (): string[] => [cwd === '/' ? `/${process.env.NEXT_PUBLIC_NAME}` : `/${process.env.NEXT_PUBLIC_NAME}${cwd}`];
 
-  const whoamiCommand = (): string[] => ['suhas'];
+  const whoamiCommand = (): string[] => [process.env.NEXT_PUBLIC_TERMINAL_USER || 'user'];
 
   const echoCommand = (text: string): string[] => [text || ''];
 
   // Helper to get the prompt string
   const getPrompt = (path: string) => {
     const displayPath = path === '/' ? '~' : `~${path}`;
-    return `suhas@portfolio:${displayPath}$`;
+    return `${process.env.NEXT_PUBLIC_TERMINAL_USER}@${process.env.NEXT_PUBLIC_TERMINAL_HOST}:${displayPath}$`;
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -448,7 +448,7 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
   return (
     <div className="h-full">
       {/* Terminal */}
-      <TerminalShell title="suhas@portfolio — bash" className="h-full flex flex-col">
+      <TerminalShell title={`${process.env.NEXT_PUBLIC_TERMINAL_USER}@${process.env.NEXT_PUBLIC_TERMINAL_HOST} — bash`} className="h-full flex flex-col">
         <div
           className="grid h-full"
           style={{
@@ -465,7 +465,7 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
               <div className="flex items-center gap-1.5 text-emerald-400 font-medium text-sm">
                 <span>📁</span>
                 <span className="truncate">
-                  {cwd === '/' ? 'Suhas Uppala' : `Suhas Uppala${cwd}`}
+                  {cwd === '/' ? process.env.NEXT_PUBLIC_NAME : `${process.env.NEXT_PUBLIC_NAME}${cwd}`}
                 </span>
               </div>
             </div>
@@ -647,6 +647,369 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
                       });
                       if (currentSection.items.length > 0) sections.push(currentSection);
 
+                      // Neural network animation component for About card
+                      const NeuralNetworkAnimation = () => {
+                        const orbitNodes = [
+                          { label: 'ML', color: '#10b981', delay: '0s', angle: 0 },
+                          { label: 'CV', color: '#3b82f6', delay: '0.5s', angle: 72 },
+                          { label: 'NLP', color: '#8b5cf6', delay: '1s', angle: 144 },
+                          { label: 'Web', color: '#06b6d4', delay: '1.5s', angle: 216 },
+                          { label: 'Data', color: '#f59e0b', delay: '2s', angle: 288 },
+                        ];
+
+                        return (
+                          <div className="relative w-full h-full min-h-[280px] flex items-center justify-center">
+                            {/* Outer orbit ring */}
+                            <div className="absolute w-56 h-56 rounded-full border border-slate-600/20 animate-orbit">
+                              {orbitNodes.map((node, idx) => {
+                                const rad = (node.angle * Math.PI) / 180;
+                                const x = Math.cos(rad) * 112;
+                                const y = Math.sin(rad) * 112;
+                                return (
+                                  <div
+                                    key={idx}
+                                    className="absolute animate-node-pulse"
+                                    style={{
+                                      left: `calc(50% + ${x}px - 16px)`,
+                                      top: `calc(50% + ${y}px - 16px)`,
+                                      color: node.color,
+                                      animationDelay: node.delay,
+                                    }}
+                                  >
+                                    <div
+                                      className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold border animate-orbit-reverse"
+                                      style={{
+                                        backgroundColor: `${node.color}15`,
+                                        borderColor: `${node.color}40`,
+                                        color: node.color,
+                                      }}
+                                    >
+                                      {node.label}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+
+                            {/* Middle orbit ring */}
+                            <div className="absolute w-36 h-36 rounded-full border border-emerald-500/10 animate-orbit-reverse" />
+
+                            {/* Inner orbit ring */}
+                            <div className="absolute w-20 h-20 rounded-full border border-emerald-500/20 animate-orbit-slow" />
+
+                            {/* Connection lines (SVG) */}
+                            <svg className="absolute w-56 h-56 animate-connection-glow" viewBox="-112 -112 224 224">
+                              {orbitNodes.map((node, idx) => {
+                                const rad = (node.angle * Math.PI) / 180;
+                                const x = Math.cos(rad) * 112;
+                                const y = Math.sin(rad) * 112;
+                                return (
+                                  <line
+                                    key={idx}
+                                    x1="0" y1="0"
+                                    x2={x} y2={y}
+                                    stroke={node.color}
+                                    strokeWidth="0.5"
+                                    strokeDasharray="4 4"
+                                    style={{
+                                      animation: `dataFlow 2s linear infinite`,
+                                      animationDelay: node.delay,
+                                    }}
+                                  />
+                                );
+                              })}
+                              {/* Cross connections */}
+                              {orbitNodes.map((node, idx) => {
+                                const nextNode = orbitNodes[(idx + 2) % orbitNodes.length];
+                                const rad1 = (node.angle * Math.PI) / 180;
+                                const rad2 = (nextNode.angle * Math.PI) / 180;
+                                return (
+                                  <line
+                                    key={`cross-${idx}`}
+                                    x1={Math.cos(rad1) * 112}
+                                    y1={Math.sin(rad1) * 112}
+                                    x2={Math.cos(rad2) * 112}
+                                    y2={Math.sin(rad2) * 112}
+                                    stroke="rgba(100, 200, 180, 0.08)"
+                                    strokeWidth="0.5"
+                                  />
+                                );
+                              })}
+                            </svg>
+
+                            {/* Core center node */}
+                            <div className="relative z-10 w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-600/20 border border-emerald-500/30 flex items-center justify-center animate-core-glow animate-float">
+                              <Brain size={28} className="text-emerald-400" />
+                            </div>
+
+                            {/* Floating particles */}
+                            {[...Array(6)].map((_, idx) => (
+                              <div
+                                key={`particle-${idx}`}
+                                className="absolute w-1 h-1 rounded-full bg-emerald-400/40 animate-float"
+                                style={{
+                                  left: `${20 + Math.random() * 60}%`,
+                                  top: `${20 + Math.random() * 60}%`,
+                                  animationDelay: `${idx * 0.7}s`,
+                                  animationDuration: `${3 + Math.random() * 2}s`,
+                                }}
+                              />
+                            ))}
+                          </div>
+                        );
+                      };
+
+                      // Render content section helper
+                      const renderContentSections = (sections: { name: string; items: string[] }[]) => (
+                        <div className="space-y-4">
+                          {sections.map((section, sIdx) => (
+                            <div key={sIdx}>
+                              {section.name !== 'content' && (
+                                <h4 className="text-cyan-400 font-semibold text-sm mb-2">{section.name}</h4>
+                              )}
+                              <div className="space-y-1">
+                                {section.items.map((item, iIdx) => {
+                                  if (item.startsWith('•') || item.startsWith('- ')) {
+                                    return (
+                                      <div key={iIdx} className="text-slate-300 text-sm flex items-start gap-2 pl-2">
+                                        <span className="text-emerald-500 mt-0.5">›</span>
+                                        <span>{item.replace(/^[•\-]\s*/, '')}</span>
+                                      </div>
+                                    );
+                                  }
+                                  if (item.match(/^[🏆🥈🥉🏅📜⭐🎓📧📱📍🔗]/)) {
+                                    return (
+                                      <div key={iIdx} className="text-slate-200 text-sm py-1">{item}</div>
+                                    );
+                                  }
+                                  if (item.match(/████/)) {
+                                    const parts = item.split(/\s{2,}/);
+                                    return (
+                                      <div key={iIdx} className="flex items-center gap-3 text-sm">
+                                        <span className="text-slate-300 w-24">{parts[0]}</span>
+                                        <span className="text-emerald-400">{item.match(/█+/)?.[0] || ''}</span>
+                                        <span className="text-slate-600">{item.match(/░+/)?.[0] || ''}</span>
+                                        <span className="text-slate-500 text-xs">{parts[1]?.match(/\d+%/)?.[0] || ''}</span>
+                                      </div>
+                                    );
+                                  }
+                                  if (item.includes('github.com') || item.includes('linkedin.com') || item.includes('@')) {
+                                    return (
+                                      <div key={iIdx} className="text-blue-400 text-sm hover:text-blue-300">{item}</div>
+                                    );
+                                  }
+                                  if (item.match(/^━+$/)) {
+                                    return <div key={iIdx} className="border-t border-slate-700/50 my-2" />;
+                                  }
+                                  return (
+                                    <div key={iIdx} className="text-slate-300 text-sm leading-relaxed">{item}</div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      );
+
+                      // About card uses two-column layout with animation
+                      if (fileType === 'about') {
+                        return (
+                          <div key={i} className="my-4">
+                            <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
+                              {/* Header */}
+                              <div className="flex items-center gap-4 mb-4 pb-4 border-b border-slate-700/50">
+                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/30 flex items-center justify-center">
+                                  {getFileIcon()}
+                                </div>
+                                <h3 className="text-xl font-bold text-emerald-400">{title}</h3>
+                              </div>
+                              
+                              {/* Two-column: Content + Animation */}
+                              <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-6">
+                                {/* Left: Content */}
+                                {renderContentSections(sections)}
+                                
+                                {/* Right: Neural Network Animation */}
+                                <div className="hidden md:flex items-center justify-center">
+                                  <NeuralNetworkAnimation />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // Experience card uses two-column layout with timeline tree animation
+                      if (fileType === 'experience') {
+                        // Parse experience entries from sections
+                        const experienceEntries: { period: string; role: string; company: string; details: string[] }[] = [];
+                        let currentEntry: { period: string; role: string; company: string; details: string[] } | null = null;
+
+                        sections.forEach(section => {
+                          if (section.name !== 'content') {
+                            // Section name is the time period
+                            const items = section.items.filter(it => it.trim());
+                            currentEntry = {
+                              period: section.name,
+                              role: items[0] || '',
+                              company: items[1] || '',
+                              details: items.slice(2).map(d => d.replace(/^[•\-]\s*/, '')),
+                            };
+                            experienceEntries.push(currentEntry);
+                          } else {
+                            // Parse content section for entries
+                            let tempEntry: { period: string; role: string; company: string; details: string[] } | null = null;
+                            section.items.forEach(item => {
+                              if (tempEntry) {
+                                if (item.startsWith('•') || item.startsWith('- ')) {
+                                  tempEntry.details.push(item.replace(/^[•\-]\s*/, ''));
+                                } else if (!tempEntry.company) {
+                                  tempEntry.company = item;
+                                } else {
+                                  // New entry starting
+                                  experienceEntries.push(tempEntry);
+                                  tempEntry = { period: '', role: item, company: '', details: [] };
+                                }
+                              } else {
+                                tempEntry = { period: '', role: item, company: '', details: [] };
+                              }
+                            });
+                            if (tempEntry && (tempEntry as { role: string }).role) {
+                              experienceEntries.push(tempEntry);
+                            }
+                          }
+                        });
+
+                        const nodeColors = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+
+                        // Reusable window card renderer
+                        const renderWindowCard = (
+                          entry: { period: string; role: string; company: string; details: string[] },
+                          color: string,
+                          fadeDelay: string,
+                          shimmerDelay: string,
+                        ) => (
+                          <div
+                            className="animate-window-fade h-full"
+                            style={{ animationDelay: fadeDelay }}
+                          >
+                            <div
+                              className="rounded-lg border overflow-hidden animate-window-shimmer backdrop-blur-sm h-full"
+                              style={{
+                                borderColor: `${color}40`,
+                                backgroundColor: `${color}08`,
+                                animationDelay: shimmerDelay,
+                              }}
+                            >
+                              {/* Title bar */}
+                              <div
+                                className="flex items-center justify-between px-3 py-1.5"
+                                style={{ backgroundColor: `${color}15`, borderBottom: `1px solid ${color}25` }}
+                              >
+                                <div className="flex items-center gap-1.5">
+                                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: `${color}80` }} />
+                                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: `${color}40` }} />
+                                </div>
+                                <span className="text-[10px] font-mono opacity-70" style={{ color }}>{entry.period}</span>
+                                <span className="text-xs opacity-50" style={{ color }}>✕</span>
+                              </div>
+                              {/* Body */}
+                              <div className="px-3.5 py-3">
+                                <div className="text-sm font-semibold leading-tight" style={{ color }}>{entry.role}</div>
+                                <div className="text-xs text-slate-400 mt-1">{entry.company}</div>
+                                {entry.details.length > 0 && (
+                                  <div className="mt-2 space-y-1">
+                                    {entry.details.map((d, dIdx) => (
+                                      <div key={dIdx} className="text-[11px] text-slate-400 flex items-start gap-1.5">
+                                        <span style={{ color }} className="mt-px text-xs">›</span>
+                                        <span>{d}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+
+                        // Timeline Tree — 3-column CSS grid for perfect symmetry
+                        const TimelineTreeAnimation = () => (
+                          <div className="relative w-full max-w-3xl mx-auto py-6">
+                            {/* 3-column grid: left-card | center-spine | right-card */}
+                            <div className="grid" style={{ gridTemplateColumns: 'minmax(0, 1fr) 60px minmax(0, 1fr)', gap: '0' }}>
+                              {experienceEntries.map((entry, idx) => {
+                                const isLeft = idx % 2 === 0;
+                                const color = nodeColors[idx % nodeColors.length];
+                                const fadeDelay = `${idx * 0.2}s`;
+                                const shimmerDelay = `${idx * 1}s`;
+
+                                return (
+                                  <Fragment key={idx}>
+                                    {/* Left column */}
+                                    <div className="flex items-center justify-end overflow-hidden" style={{ minHeight: '120px', paddingTop: idx > 0 ? '16px' : '0' }}>
+                                      {isLeft ? renderWindowCard(entry, color, fadeDelay, shimmerDelay) : null}
+                                    </div>
+
+                                    {/* Center column — spine + dot + arrows */}
+                                    <div className="relative flex items-center justify-center" style={{ paddingTop: idx > 0 ? '16px' : '0' }}>
+                                      {/* Vertical spine segment */}
+                                      <div className="absolute top-0 bottom-0 left-1/2 -translate-x-[1px] w-[2px]" style={{
+                                        background: `linear-gradient(to bottom, ${nodeColors[Math.max(0, idx - 1) % nodeColors.length]}60, ${color}60)`,
+                                      }} />
+
+                                      {/* Center dot */}
+                                      <div
+                                        className="relative z-10 w-4 h-4 rounded-full animate-timeline-pulse flex-shrink-0"
+                                        style={{ backgroundColor: color, color: color }}
+                                      />
+
+                                      {/* Arrow: left-pointing (card is on the left) */}
+                                      {isLeft && (
+                                        <svg className="absolute left-0 top-1/2 -translate-y-1/2" width="22" height="12" viewBox="0 0 22 12" style={{ marginTop: idx > 0 ? '8px' : '0' }}>
+                                          <line x1="22" y1="6" x2="8" y2="6" stroke={color} strokeWidth="1" strokeDasharray="4 4" className="animate-arrow-flow" style={{ animationDelay: fadeDelay }} />
+                                          <polygon points="2,6 8,2 8,10" fill={color} opacity="0.8" />
+                                        </svg>
+                                      )}
+
+                                      {/* Arrow: right-pointing (card is on the right) */}
+                                      {!isLeft && (
+                                        <svg className="absolute right-0 top-1/2 -translate-y-1/2" width="22" height="12" viewBox="0 0 22 12" style={{ marginTop: idx > 0 ? '8px' : '0' }}>
+                                          <line x1="0" y1="6" x2="14" y2="6" stroke={color} strokeWidth="1" strokeDasharray="4 4" className="animate-arrow-flow" style={{ animationDelay: fadeDelay }} />
+                                          <polygon points="20,6 14,2 14,10" fill={color} opacity="0.8" />
+                                        </svg>
+                                      )}
+                                    </div>
+
+                                    {/* Right column */}
+                                    <div className="flex items-center justify-start overflow-hidden" style={{ minHeight: '120px', paddingTop: idx > 0 ? '16px' : '0' }}>
+                                      {!isLeft ? renderWindowCard(entry, color, fadeDelay, shimmerDelay) : null}
+                                    </div>
+                                  </Fragment>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+
+                        return (
+                          <div key={i} className="my-4">
+                            <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
+                              {/* Header */}
+                              <div className="flex items-center gap-4 mb-4 pb-4 border-b border-slate-700/50">
+                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/30 flex items-center justify-center">
+                                  {getFileIcon()}
+                                </div>
+                                <h3 className="text-xl font-bold text-emerald-400">{title}</h3>
+                              </div>
+                              
+                              {/* Timeline Tree as sole content */}
+                              <TimelineTreeAnimation />
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // Default card for other file types
                       return (
                         <div key={i} className="my-4">
                           <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
@@ -659,60 +1022,7 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
                             </div>
                             
                             {/* Content */}
-                            <div className="space-y-4">
-                              {sections.map((section, sIdx) => (
-                                <div key={sIdx}>
-                                  {section.name !== 'content' && (
-                                    <h4 className="text-cyan-400 font-semibold text-sm mb-2">{section.name}</h4>
-                                  )}
-                                  <div className="space-y-1">
-                                    {section.items.map((item, iIdx) => {
-                                      // Check for bullet points
-                                      if (item.startsWith('•') || item.startsWith('- ')) {
-                                        return (
-                                          <div key={iIdx} className="text-slate-300 text-sm flex items-start gap-2 pl-2">
-                                            <span className="text-emerald-500 mt-0.5">›</span>
-                                            <span>{item.replace(/^[•\-]\s*/, '')}</span>
-                                          </div>
-                                        );
-                                      }
-                                      // Check for emoji lines (achievements, contact)
-                                      if (item.match(/^[🏆🥈🥉🏅📜⭐🎓📧📱📍🔗]/)) {
-                                        return (
-                                          <div key={iIdx} className="text-slate-200 text-sm py-1">{item}</div>
-                                        );
-                                      }
-                                      // Check for progress bars
-                                      if (item.match(/████/)) {
-                                        const parts = item.split(/\s{2,}/);
-                                        return (
-                                          <div key={iIdx} className="flex items-center gap-3 text-sm">
-                                            <span className="text-slate-300 w-24">{parts[0]}</span>
-                                            <span className="text-emerald-400">{item.match(/█+/)?.[0] || ''}</span>
-                                            <span className="text-slate-600">{item.match(/░+/)?.[0] || ''}</span>
-                                            <span className="text-slate-500 text-xs">{parts[1]?.match(/\d+%/)?.[0] || ''}</span>
-                                          </div>
-                                        );
-                                      }
-                                      // Check for links
-                                      if (item.includes('github.com') || item.includes('linkedin.com') || item.includes('@')) {
-                                        return (
-                                          <div key={iIdx} className="text-blue-400 text-sm hover:text-blue-300">{item}</div>
-                                        );
-                                      }
-                                      // Check for dividers
-                                      if (item.match(/^━+$/)) {
-                                        return <div key={iIdx} className="border-t border-slate-700/50 my-2" />;
-                                      }
-                                      // Regular text
-                                      return (
-                                        <div key={iIdx} className="text-slate-300 text-sm leading-relaxed">{item}</div>
-                                      );
-                                    })}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
+                            {renderContentSections(sections)}
                           </div>
                         </div>
                       );
@@ -781,7 +1091,7 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
                         <span className="text-slate-400">{content.split(/[█░]+/).pop() || ''}</span>
                       </div>
                     );
-                  } else if (line.startsWith('suhas@portfolio:')) {
+                  } else if (line.startsWith(`${process.env.NEXT_PUBLIC_TERMINAL_USER}@${process.env.NEXT_PUBLIC_TERMINAL_HOST}:`)) {
                     return (
                       <div key={i} className="whitespace-pre-wrap text-emerald-400">
                         {line}
@@ -803,7 +1113,7 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
               className="shrink-0 border-t border-slate-800/70 flex items-center gap-2 p-2 bg-slate-950/30"
             >
               <span className="text-emerald-400 font-mono shrink-0">
-                suhas@portfolio:{cwd === '/' ? '~' : `~${cwd}`}$
+                {process.env.NEXT_PUBLIC_TERMINAL_USER}@{process.env.NEXT_PUBLIC_TERMINAL_HOST}:{cwd === '/' ? '~' : `~${cwd}`}$
               </span>
               <input
                 value={input}

@@ -145,3 +145,191 @@ body {
 :focus:not(:focus-visible) {
   outline: none;
 }
+
+/* Neural Network Animation for About Card */
+@keyframes orbitSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbitSpinReverse {
+  0% {
+    transform: rotate(360deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes nodePulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+    box-shadow: 0 0 6px currentColor;
+  }
+
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+    box-shadow: 0 0 16px currentColor;
+  }
+}
+
+@keyframes connectionGlow {
+
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes floatUpDown {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes dataFlow {
+  0% {
+    stroke-dashoffset: 20;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes coreGlow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.2), 0 0 40px rgba(16, 185, 129, 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.4), 0 0 60px rgba(16, 185, 129, 0.2);
+  }
+}
+
+.animate-orbit {
+  animation: orbitSpin 20s linear infinite;
+}
+
+.animate-orbit-reverse {
+  animation: orbitSpinReverse 15s linear infinite;
+}
+
+.animate-orbit-slow {
+  animation: orbitSpin 30s linear infinite;
+}
+
+.animate-node-pulse {
+  animation: nodePulse 3s ease-in-out infinite;
+}
+
+.animate-connection-glow {
+  animation: connectionGlow 4s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: floatUpDown 4s ease-in-out infinite;
+}
+
+.animate-core-glow {
+  animation: coreGlow 3s ease-in-out infinite;
+}
+
+/* Experience Timeline Tree Animations */
+@keyframes arrowFlow {
+  0% {
+    stroke-dashoffset: 16;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes windowFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.95);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes windowShimmer {
+
+  0%,
+  100% {
+    border-color: rgba(139, 92, 246, 0.25);
+  }
+
+  50% {
+    border-color: rgba(139, 92, 246, 0.5);
+  }
+}
+
+@keyframes timelinePulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 4px currentColor, 0 0 8px currentColor;
+  }
+
+  50% {
+    box-shadow: 0 0 8px currentColor, 0 0 16px currentColor;
+  }
+}
+
+@keyframes branchGrow {
+  0% {
+    width: 0;
+  }
+
+  100% {
+    width: 100%;
+  }
+}
+
+.animate-arrow-flow {
+  animation: arrowFlow 1.5s linear infinite;
+}
+
+.animate-window-fade {
+  animation: windowFadeIn 0.6s ease-out both;
+}
+
+.animate-window-shimmer {
+  animation: windowShimmer 3s ease-in-out infinite;
+}
+
+.animate-timeline-pulse {
+  animation: timelinePulse 2s ease-in-out infinite;
+}
+
+.animate-branch-grow {
+  animation: branchGrow 0.8s ease-out both;
+}

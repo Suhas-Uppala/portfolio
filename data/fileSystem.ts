@@ -7,7 +7,7 @@ export interface FileNode {
 }
 
 export const fileSystem: FileNode = {
-  name: 'Suhas Uppala',
+  name: process.env.NEXT_PUBLIC_NAME || 'Portfolio',
   type: 'folder',
   path: '/',
   children: [
@@ -17,12 +17,12 @@ export const fileSystem: FileNode = {
       path: '/about.txt',
       content: `=== ABOUT ME ===
 
-Name: Suhas Uppala
-Location: Hyderabad, Telangana
-Email: suhasuppala1805@gmail.com
-Phone: +91-79896 65270
+Name: ${process.env.NEXT_PUBLIC_NAME}
+Location: ${process.env.NEXT_PUBLIC_LOCATION}
+Email: ${process.env.NEXT_PUBLIC_EMAIL}
+Phone: ${process.env.NEXT_PUBLIC_PHONE}
 
-I'm an AI/ML Enthusiast and Full-Stack Developer pursuing 
+I'm an AI/ML Enthusiast  
 B.Tech in Computer Science & Engineering (AIML) at 
 VNR Vignana Jyothi Institute of Engineering and Technology.
 
@@ -132,14 +132,14 @@ Windows, Linux
       path: '/contact.txt',
       content: `=== CONTACT INFORMATION ===
 
-📧 Email: suhasuppala1805@gmail.com
-📱 Phone: +91-79896 65270
-📍 Location: Hyderabad, Telangana, India
+📧 Email: ${process.env.NEXT_PUBLIC_EMAIL}
+📱 Phone: ${process.env.NEXT_PUBLIC_PHONE}
+📍 Location: ${process.env.NEXT_PUBLIC_LOCATION}, India
 
 🔗 LINKS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-GitHub      : github.com/suhas-uppala
-LinkedIn    : linkedin.com/in/Suhas-Uppala
+GitHub      : ${process.env.NEXT_PUBLIC_GITHUB_USERNAME ? `github.com/${process.env.NEXT_PUBLIC_GITHUB_USERNAME}` : ''}
+LinkedIn    : ${process.env.NEXT_PUBLIC_LINKEDIN_USERNAME ? `linkedin.com/in/${process.env.NEXT_PUBLIC_LINKEDIN_USERNAME}` : ''}
 
 Feel free to reach out for collaborations, 
 opportunities, or just a chat about tech!`
@@ -172,7 +172,7 @@ delivery routes and time slots for 1,000+ daily shipments.
 • Scalable backend services for seamless delivery tracking
 
 [Links]
-GitHub: github.com/suhas-uppala/optideliver`
+GitHub: ${process.env.NEXT_PUBLIC_PROJECT_OPTIDELIVER_GITHUB}`
         },
         {
           name: 'sportai.txt',
@@ -199,7 +199,7 @@ Real-time motion and biometric analysis platform for athletes.
 🏆 Winner, GDGC Solution Challenge 2025
 
 [Links]
-GitHub: github.com/suhas-uppala/sportai`
+GitHub: ${process.env.NEXT_PUBLIC_PROJECT_SPORTAI_GITHUB}`
         },
         {
           name: 'books-hub.txt',
@@ -223,7 +223,7 @@ borrowing, and returns through a clean web interface.
 • Future feature extensions support
 
 [Links]
-GitHub: github.com/suhas-uppala/books-hub`
+GitHub: ${process.env.NEXT_PUBLIC_PROJECT_BOOKSHUB_GITHUB}`
         },
         {
           name: 'anomaly-detection.txt',
@@ -247,7 +247,7 @@ and flag suspicious activity in real-time.
 • Date-wise anomaly logs for streamlined monitoring
 
 [Links]
-GitHub: github.com/suhas-uppala/anomaly-detection`
+GitHub: ${process.env.NEXT_PUBLIC_PROJECT_ANOMALY_GITHUB}`
         },
         {
           name: 'postal-logistics-research.txt',
@@ -353,8 +353,8 @@ Use terminal commands to explore:
 
 ## About Me
 
-I'm Suhas Uppala, an AI/ML Enthusiast and Full-Stack Developer
-pursuing B.Tech in CSE (AIML) at VNR VJIET, Hyderabad.
+I'm ${process.env.NEXT_PUBLIC_NAME}, an AI/ML Enthusiast and Full-Stack Developer
+pursuing B.Tech in CSE (AIML) at ${process.env.NEXT_PUBLIC_COLLEGE_SHORT}, ${process.env.NEXT_PUBLIC_LOCATION?.split(',')[0]}.
 
 🏆 Winner - GDGC Solution Challenge 2025
 ⭐ Finalist - Smart India Hackathon 2024 & 2025
@@ -362,9 +362,9 @@ pursuing B.Tech in CSE (AIML) at VNR VJIET, Hyderabad.
 
 ## Contact
 
-Email: suhasuppala1805@gmail.com
-LinkedIn: linkedin.com/in/Suhas-Uppala
-GitHub: github.com/suhas-uppala
+Email: ${process.env.NEXT_PUBLIC_EMAIL}
+LinkedIn: ${process.env.NEXT_PUBLIC_LINKEDIN_USERNAME ? `linkedin.com/in/${process.env.NEXT_PUBLIC_LINKEDIN_USERNAME}` : ''}
+GitHub: ${process.env.NEXT_PUBLIC_GITHUB_USERNAME ? `github.com/${process.env.NEXT_PUBLIC_GITHUB_USERNAME}` : ''}
 
 ---
 Built with ❤️ using Next.js & TypeScript`

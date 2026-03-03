@@ -34,7 +34,7 @@ export default function Footer() {
         <div className="text-sm text-slate-300">
           <span className="text-slate-500">©</span> {new Date().getFullYear()}{' '}
           <span className="font-medium bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">
-            Suhas Uppala
+            {process.env.NEXT_PUBLIC_NAME}
           </span>
         </div>
 
@@ -52,7 +52,7 @@ export default function Footer() {
           {/* Location */}
           <div className="hidden sm:flex items-center gap-2 text-slate-400">
             <MapPin size={14} className="text-emerald-400" />
-            <span className="text-sm">Hyderabad, India</span>
+            <span className="text-sm">{process.env.NEXT_PUBLIC_LOCATION_SHORT}</span>
           </div>
           
           {/* Divider */}

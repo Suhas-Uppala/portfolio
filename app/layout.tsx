@@ -2,13 +2,13 @@ import './globals.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Suhas Uppala | Portfolio',
-  description: 'AI/ML Enthusiast & Full-Stack Developer - Interactive Terminal Portfolio',
-  keywords: ['portfolio', 'AI', 'ML', 'developer', 'full-stack', 'Suhas Uppala'],
-  authors: [{ name: 'Suhas Uppala' }],
+  title: process.env.NEXT_PUBLIC_SITE_TITLE,
+  description: process.env.NEXT_PUBLIC_SITE_DESCRIPTION,
+  keywords: process.env.NEXT_PUBLIC_SITE_KEYWORDS?.split(',') || [],
+  authors: [{ name: process.env.NEXT_PUBLIC_NAME }],
   openGraph: {
-    title: 'Suhas Uppala | Portfolio',
-    description: 'AI/ML Enthusiast & Full-Stack Developer - Interactive Terminal Portfolio',
+    title: process.env.NEXT_PUBLIC_SITE_TITLE,
+    description: process.env.NEXT_PUBLIC_SITE_DESCRIPTION,
     type: 'website',
   },
 };

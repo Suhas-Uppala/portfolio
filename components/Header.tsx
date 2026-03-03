@@ -63,10 +63,10 @@ export default function Header({ currentView, onExploreProjects, onGoHome }: Hea
           {/* Name */}
           <div className="flex flex-col">
             <span className="text-lg font-bold text-white group-hover:text-emerald-50 transition-colors">
-              Suhas Uppala
+              {process.env.NEXT_PUBLIC_NAME}
             </span>
             <span className="text-xs text-slate-400 hidden sm:block">
-              AI/ML Engineer & Full-Stack Developer
+              {process.env.NEXT_PUBLIC_TITLE}
             </span>
           </div>
         </div>
@@ -88,7 +88,7 @@ export default function Header({ currentView, onExploreProjects, onGoHome }: Hea
             <div className="flex items-center gap-3">
               {/* GitHub */}
               <a
-                href="https://github.com/suhas-uppala"
+                href={process.env.NEXT_PUBLIC_GITHUB_URL}
                 target="_blank"
                 rel="noreferrer"
                 className="group relative"
@@ -103,7 +103,7 @@ export default function Header({ currentView, onExploreProjects, onGoHome }: Hea
               
               {/* LinkedIn */}
               <a
-                href="https://linkedin.com/in/Suhas-Uppala"
+                href={process.env.NEXT_PUBLIC_LINKEDIN_URL}
                 target="_blank"
                 rel="noreferrer"
                 className="group relative"
@@ -118,7 +118,7 @@ export default function Header({ currentView, onExploreProjects, onGoHome }: Hea
               
               {/* Email */}
               <a
-                href="mailto:suhasuppala1805@gmail.com"
+                href={`mailto:${process.env.NEXT_PUBLIC_EMAIL}`}
                 className="group relative"
               >
                 <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-rose-600/20 to-orange-500/20 border border-rose-500/30 hover:border-rose-400/60 hover:from-rose-600/30 hover:to-orange-500/30 transition-all duration-300 group-hover:scale-105">

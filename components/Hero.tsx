@@ -22,10 +22,10 @@ export default function Hero({ onViewMore }: HeroProps) {
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
-            <span className="text-slate-200">Suhas Uppala</span>
+            <span className="text-slate-200">{process.env.NEXT_PUBLIC_NAME}</span>
             <br />
             <span className="bg-gradient-to-r from-emerald-400 to-emerald-200 bg-clip-text text-transparent">
-              AI/ML Enthusiast · Full‑Stack Developer
+              {process.env.NEXT_PUBLIC_TAGLINE}
             </span>
           </h1>
 
@@ -35,7 +35,7 @@ export default function Hero({ onViewMore }: HeroProps) {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.6 }}
           >
-            Hyderabad, Telangana — +91-79896 65270 · suhasuppala1805@gmail.com
+            {process.env.NEXT_PUBLIC_LOCATION} — {process.env.NEXT_PUBLIC_PHONE} · {process.env.NEXT_PUBLIC_EMAIL}
           </motion.p>
 
           <motion.div
@@ -51,7 +51,7 @@ export default function Hero({ onViewMore }: HeroProps) {
               Explore
             </button>
             <a
-              href="/Suhas_Uppala_Resume.pdf"
+              href={process.env.NEXT_PUBLIC_RESUME_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="px-5 py-2.5 rounded-md border border-slate-700/70 hover:border-slate-500 text-slate-200 hover:text-white transition-colors"
