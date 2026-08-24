@@ -17,6 +17,9 @@ export default function Header({ currentView, onExploreProjects, onGoHome }: Hea
       {/* Background with glassmorphism */}
       <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-xl" />
       
+      {/* Noise overlay */}
+      <div className="noise-texture opacity-[0.03]" />
+      
       <div className="relative w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Logo/Name */}
         {/* Logo/Name */}

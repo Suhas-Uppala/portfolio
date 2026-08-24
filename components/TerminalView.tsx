@@ -16,28 +16,40 @@ const techIcons: { [key: string]: { icon: React.ReactNode; color: string } } = {
   'fastapi': { icon: <Zap size={20} />, color: '#009688' },
   'react': { icon: <Code size={20} />, color: '#61DAFB' },
   'react.js': { icon: <Code size={20} />, color: '#61DAFB' },
+  'next.js': { icon: <Globe size={20} />, color: '#000000' },
   'node.js': { icon: <Server size={20} />, color: '#339933' },
   'express.js': { icon: <Server size={20} />, color: '#000000' },
   'mongodb': { icon: <Database size={20} />, color: '#47A248' },
   'postgresql': { icon: <Database size={20} />, color: '#4169E1' },
   'mysql': { icon: <Database size={20} />, color: '#4479A1' },
+  'sql': { icon: <Database size={20} />, color: '#336791' },
   'docker': { icon: <Box size={20} />, color: '#2496ED' },
   'flutter': { icon: <Smartphone size={20} />, color: '#02569B' },
   'opencv': { icon: <Globe size={20} />, color: '#5C3EE8' },
+  'ultralytics': { icon: <Cpu size={20} />, color: '#0080FF' },
+  'yolov8': { icon: <Cpu size={20} />, color: '#FF6F61' },
+  'yolov11': { icon: <Cpu size={20} />, color: '#FF6F61' },
+  'jetson': { icon: <Cpu size={20} />, color: '#76B900' },
+  'xgboost': { icon: <Zap size={20} />, color: '#FF4500' },
   'twilio': { icon: <MessageSquare size={20} />, color: '#F22F46' },
   'langchain': { icon: <Layers size={20} />, color: '#1C3C3C' },
   'gemini': { icon: <Brain size={20} />, color: '#8E75B2' },
   'rag': { icon: <Brain size={20} />, color: '#10B981' },
   'genai': { icon: <Brain size={20} />, color: '#8B5CF6' },
+  'gen ai': { icon: <Brain size={20} />, color: '#8B5CF6' },
   'mern': { icon: <Layers size={20} />, color: '#00D8FF' },
+  'streamlit': { icon: <Globe size={20} />, color: '#FF4B4B' },
   'aws': { icon: <Cloud size={20} />, color: '#FF9900' },
   'gcp': { icon: <Cloud size={20} />, color: '#4285F4' },
+  'google cloud vision': { icon: <Cloud size={20} />, color: '#4285F4' },
   'random forest': { icon: <BarChart3 size={20} />, color: '#228B22' },
-  'xgboost': { icon: <Zap size={20} />, color: '#FF4500' },
   'kmeans': { icon: <BarChart3 size={20} />, color: '#9370DB' },
   'google maps': { icon: <Globe size={20} />, color: '#4285F4' },
   'geolocator': { icon: <Globe size={20} />, color: '#34A853' },
+  'yolo': { icon: <Cpu size={20} />, color: '#FF6F61' },
+  'nlp': { icon: <MessageSquare size={20} />, color: '#6366F1' },
 };
+
 
 const TechIcon = ({ tech }: { tech: string }) => {
   const techLower = tech.toLowerCase().trim();
@@ -517,9 +529,11 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
                       });
 
                       return (
-                        <div key={i} className="my-4">
+                        <div key={i} className="my-4 stagger-fade-in">
                           {/* Project Card */}
-                          <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
+                          <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-6 backdrop-blur-md card-glow card-accent-border relative overflow-hidden">
+                            {/* Ambient background glow inside the card */}
+                            <div className="absolute -top-12 -right-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
                             {/* Header */}
                             <div className="flex items-start justify-between gap-4 mb-4">
                               <h3 className="text-xl font-bold text-emerald-400 flex-1">
@@ -581,6 +595,18 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
                                     </li>
                                   ))}
                                 </ul>
+                              </div>
+                            )}
+                            
+                            {/* Research section */}
+                            {sections.research?.length > 0 && (
+                              <div className="mb-4">
+                                <h4 className="text-blue-400 font-semibold text-sm mb-2">📝 Research</h4>
+                                <div className="space-y-1 pl-2">
+                                  {sections.research.map((item, idx) => (
+                                    <p key={idx} className="text-blue-300/80 text-sm">{item}</p>
+                                  ))}
+                                </div>
                               </div>
                             )}
                             
@@ -784,12 +810,25 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
                                   }
                                   if (item.match(/████/)) {
                                     const parts = item.split(/\s{2,}/);
+                                    const skillName = parts[0]?.trim() || '';
+                                    const percentMatch = item.match(/\d+%/);
+                                    const percentStr = percentMatch ? percentMatch[0] : '80%';
+                                    const percentValue = parseInt(percentStr) || 80;
                                     return (
-                                      <div key={iIdx} className="flex items-center gap-3 text-sm">
-                                        <span className="text-slate-300 w-24">{parts[0]}</span>
-                                        <span className="text-emerald-400">{item.match(/█+/)?.[0] || ''}</span>
-                                        <span className="text-slate-600">{item.match(/░+/)?.[0] || ''}</span>
-                                        <span className="text-slate-500 text-xs">{parts[1]?.match(/\d+%/)?.[0] || ''}</span>
+                                      <div key={iIdx} className="space-y-1.5 my-3 max-w-md stagger-fade-in">
+                                        <div className="flex justify-between items-center text-xs">
+                                          <span className="text-slate-300 font-semibold font-mono">{skillName}</span>
+                                          <span className="text-emerald-400 font-bold font-mono">{percentStr}</span>
+                                        </div>
+                                        <div className="h-2 w-full bg-slate-950/60 rounded-full overflow-hidden border border-slate-800/60 relative">
+                                          <div 
+                                            className="h-full skill-bar-fill rounded-full" 
+                                            style={{ 
+                                              '--fill-width': `${percentValue}%`,
+                                              width: `${percentValue}%` 
+                                            } as React.CSSProperties} 
+                                          />
+                                        </div>
                                       </div>
                                     );
                                   }
@@ -811,11 +850,63 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
                         </div>
                       );
 
+                      // Skills card renders grouping in cards with chip badges (no percentages or bars)
+                      if (fileType === 'skills') {
+                        return (
+                          <div key={i} className="my-4 stagger-fade-in">
+                            <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-6 backdrop-blur-md card-glow card-accent-border relative overflow-hidden">
+                              {/* Ambient background glow inside the card */}
+                              <div className="absolute -top-12 -right-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
+                              {/* Header */}
+                              <div className="flex items-center gap-4 mb-4 pb-4 border-b border-slate-700/50">
+                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/30 flex items-center justify-center">
+                                  {getFileIcon()}
+                                </div>
+                                <h3 className="text-xl font-bold text-emerald-400">{title}</h3>
+                              </div>
+                              
+                              {/* Skills Grid */}
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {sections.map((section, sIdx) => {
+                                  // Skip default content section if empty
+                                  if (section.name === 'content' && section.items.length === 0) return null;
+                                  const sectionTitle = section.name === 'content' ? 'General' : section.name;
+                                  return (
+                                    <div key={sIdx} className="bg-slate-950/45 rounded-lg border border-slate-800/70 p-4 hover:border-slate-700/50 transition-colors">
+                                      <h4 className="text-cyan-400 font-semibold text-xs uppercase tracking-wider mb-3 flex items-center gap-1.5 font-mono">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block animate-pulse" />
+                                        {sectionTitle}
+                                      </h4>
+                                      <div className="flex flex-wrap gap-2">
+                                        {section.items.map((item, iIdx) => {
+                                          const cleanItem = item.replace(/^[•\-]\s*/, '').trim();
+                                          return (
+                                            <div 
+                                              key={iIdx} 
+                                              className="px-2.5 py-1 rounded bg-slate-900/60 border border-slate-800/80 hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all text-slate-300 hover:text-emerald-300 text-xs font-mono flex items-center gap-1.5 hover:scale-[1.03] cursor-default"
+                                            >
+                                              <span className="w-1 h-1 rounded-full bg-emerald-500/60" />
+                                              {cleanItem}
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+
                       // About card uses two-column layout with animation
                       if (fileType === 'about') {
                         return (
-                          <div key={i} className="my-4">
-                            <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
+                          <div key={i} className="my-4 stagger-fade-in">
+                            <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-6 backdrop-blur-md card-glow card-accent-border relative overflow-hidden">
+                              {/* Ambient background glow inside the card */}
+                              <div className="absolute -top-12 -right-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
                               {/* Header */}
                               <div className="flex items-center gap-4 mb-4 pb-4 border-b border-slate-700/50">
                                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/30 flex items-center justify-center">
@@ -992,8 +1083,10 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
                         );
 
                         return (
-                          <div key={i} className="my-4">
-                            <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
+                          <div key={i} className="my-4 stagger-fade-in">
+                            <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-6 backdrop-blur-md card-glow card-accent-border relative overflow-hidden">
+                              {/* Ambient background glow inside the card */}
+                              <div className="absolute -top-12 -right-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
                               {/* Header */}
                               <div className="flex items-center gap-4 mb-4 pb-4 border-b border-slate-700/50">
                                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/30 flex items-center justify-center">
@@ -1011,8 +1104,10 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
 
                       // Default card for other file types
                       return (
-                        <div key={i} className="my-4">
-                          <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
+                        <div key={i} className="my-4 stagger-fade-in">
+                          <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-6 backdrop-blur-md card-glow card-accent-border relative overflow-hidden">
+                            {/* Ambient background glow inside the card */}
+                            <div className="absolute -top-12 -right-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
                             {/* Header */}
                             <div className="flex items-center gap-4 mb-4 pb-4 border-b border-slate-700/50">
                               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/30 flex items-center justify-center">
@@ -1118,7 +1213,7 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                className="flex-1 bg-transparent outline-none text-slate-200 font-mono placeholder:text-slate-500"
+                className="flex-1 bg-transparent outline-none text-slate-200 font-mono placeholder:text-slate-500 caret-emerald-400"
                 placeholder=""
                 autoComplete="off"
                 autoFocus

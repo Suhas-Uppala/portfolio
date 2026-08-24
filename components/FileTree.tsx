@@ -41,8 +41,23 @@ function TreeNode({ node, depth = 0, onOpenFile, currentPath = '/' }: TreeNodePr
     }
   };
 
+  const getFileIcon = () => {
+    if (isFolder) {
+      return <Folder size={14} className={`shrink-0 ${isCurrentDir ? 'text-emerald-300' : 'text-emerald-400'}`} />;
+    }
+    const name = node.name.toLowerCase();
+    if (name.includes('about')) return <FileText size={14} className="text-sky-400 shrink-0" />;
+    if (name.includes('education')) return <FileText size={14} className="text-blue-400 shrink-0" />;
+    if (name.includes('experience')) return <FileText size={14} className="text-purple-400 shrink-0" />;
+    if (name.includes('skills')) return <FileText size={14} className="text-cyan-400 shrink-0" />;
+    if (name.includes('contact')) return <FileText size={14} className="text-rose-400 shrink-0" />;
+    if (name.includes('achievements')) return <FileText size={14} className="text-yellow-400 shrink-0" />;
+    if (name.includes('certifications')) return <FileText size={14} className="text-orange-400 shrink-0" />;
+    return <FileText size={14} className="text-slate-400 shrink-0" />;
+  };
+
   return (
-    <div>
+    <div className="tree-item-enter">
       <div
         className={`
           flex items-center gap-1.5 px-2 py-1 rounded cursor-pointer text-sm
@@ -59,14 +74,11 @@ function TreeNode({ node, depth = 0, onOpenFile, currentPath = '/' }: TreeNodePr
             ) : (
               <ChevronRight size={14} className="text-slate-400 shrink-0" />
             )}
-            <Folder size={14} className={`shrink-0 ${isCurrentDir ? 'text-emerald-300' : 'text-emerald-400'}`} />
           </>
         ) : (
-          <>
-            <span className="w-3.5" />
-            <FileText size={14} className="text-slate-400 shrink-0" />
-          </>
+          <span className="w-3.5" />
         )}
+        {getFileIcon()}
         <span className={`truncate ${isFolder ? (isCurrentDir ? 'text-emerald-200 font-medium' : 'text-emerald-300') : 'text-slate-300'}`}>
           {node.name}
         </span>

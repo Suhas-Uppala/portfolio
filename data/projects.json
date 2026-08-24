@@ -1,4 +1,6 @@
 [
-{ "name": "Water Quality Analysis", "tech": "ML, Python" },
-{ "name": "Violence Detection", "tech": "Deep Learning" }
+{ "name": "CCTV Threat Detection", "tech": "YOLOv11, OpenCV, Edge AI" },
+{ "name": "OptiDeliver", "tech": "Scikit-learn, Flask, Next.js" },
+{ "name": "SportAI", "tech": "Flutter, OpenCV, RAG" },
+{ "name": "DigiPraman", "tech": "YOLOv8, XGBoost, FastAPI" }
 ]

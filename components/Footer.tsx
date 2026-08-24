@@ -24,10 +24,13 @@ export default function Footer() {
   return (
     <footer className="shrink-0 relative z-50">
       {/* Gradient border effect at top */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-emerald-500/30 via-emerald-500/50 to-emerald-500/30" />
+      <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
       
       {/* Background with glassmorphism */}
       <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-xl" />
+      
+      {/* Noise overlay */}
+      <div className="noise-texture opacity-[0.03]" />
       
       <div className="relative w-full px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         {/* Left side - Copyright */}
