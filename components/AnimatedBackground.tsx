@@ -101,7 +101,7 @@ export default function AnimatedBackground() {
       {['0x4F', '10110', '0xFF', '01001', '0xA3', '11010'].map((code, i) => (
         <motion.div
           key={`code-${i}`}
-          className="absolute text-emerald-500/10 font-mono text-xs select-none pointer-events-none"
+          className={`absolute text-emerald-500/10 font-mono text-xs select-none pointer-events-none ${i >= 3 ? 'hidden sm:block' : ''}`}
           style={{
             left: `${10 + i * 15}%`,
             top: `${15 + (i % 3) * 30}%`,

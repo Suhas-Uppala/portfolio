@@ -44,7 +44,7 @@ export default function Home() {
 
         {/* Main content area */}
         <main className="flex-1 overflow-auto green-scroll">
-          <div className={`mx-auto h-full ${view === 'hero' ? 'max-w-6xl px-4 py-6' : 'px-3 py-3'}`}>
+          <div className={`mx-auto h-full ${view === 'hero' ? 'max-w-6xl px-3 sm:px-4 py-4 sm:py-6' : 'px-1.5 sm:px-3 py-1.5 sm:py-3'}`}>
             {view === 'hero' ? (
               <Hero onViewMore={handleExploreProjects} />
             ) : (

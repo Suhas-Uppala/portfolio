@@ -4,7 +4,19 @@ import { useState, useRef, useEffect, FormEvent, MouseEvent, Fragment } from 're
 import { fileSystem, FileNode, findNode, getParentPath } from '@/data/fileSystem';
 import FileTree from './FileTree';
 import TerminalShell from './TerminalShell';
-import { ExternalLink, Cpu, Github, Database, Server, Smartphone, Brain, Code, Globe, MessageSquare, BarChart3, Layers, Box, Zap, Cloud, User, GraduationCap, Briefcase, Award, FileText, Mail, BookOpen, Trophy } from 'lucide-react';
+import { ExternalLink, Cpu, Github, Database, Server, Smartphone, Brain, Code, Globe, MessageSquare, BarChart3, Layers, Box, Zap, Cloud, User, GraduationCap, Briefcase, Award, FileText, Mail, BookOpen, Trophy, Menu, X } from 'lucide-react';
+
+// Hook to detect mobile viewport
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < breakpoint);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, [breakpoint]);
+  return isMobile;
+}
 
 // Tech icon mapping
 const techIcons: { [key: string]: { icon: React.ReactNode; color: string } } = {
@@ -100,7 +112,9 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
   const [input, setInput] = useState('');
   const [panelWidth, setPanelWidth] = useState(250);
   const [isDragging, setIsDragging] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const outputRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   // Scroll to bottom when output changes
   useEffect(() => {
@@ -439,6 +453,8 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
       setCwd(node.path);
       setOutput((prev) => [...prev, `${currentPrompt} cd ${node.name}`]);
     }
+    // Close drawer on mobile after selecting a file
+    if (isMobile) setDrawerOpen(false);
   };
 
   // Resize handlers
@@ -457,772 +473,869 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
     setIsDragging(false);
   };
 
-  return (
-    <div className="h-full">
-      {/* Terminal */}
-      <TerminalShell title={`${process.env.NEXT_PUBLIC_TERMINAL_USER}@${process.env.NEXT_PUBLIC_TERMINAL_HOST} — bash`} className="h-full flex flex-col">
-        <div
-          className="grid h-full"
-          style={{
-            gridTemplateColumns: `${panelWidth}px 8px 1fr`,
-          }}
-          onMouseMove={handleMouseMove}
-          onMouseUp={stopResize}
-          onMouseLeave={stopResize}
-        >
-          {/* File tree panel */}
-          <div className="flex flex-col min-h-0 border-r border-slate-800/70 bg-slate-950/30">
-            {/* Fixed header showing current path */}
-            <div className="shrink-0 px-2 py-2 border-b border-slate-800/50 bg-slate-900/50">
-              <div className="flex items-center gap-1.5 text-emerald-400 font-medium text-sm">
-                <span>📁</span>
-                <span className="truncate">
-                  {cwd === '/' ? process.env.NEXT_PUBLIC_NAME : `${process.env.NEXT_PUBLIC_NAME}${cwd}`}
-                </span>
-              </div>
-            </div>
-            {/* Scrollable file list */}
-            <div className="flex-1 overflow-auto green-scroll p-2 min-h-0">
-              <FileTree 
-                tree={fileSystem} 
-                onOpenFile={handleOpenFile} 
-                showRoot={false} 
-                currentPath={cwd}
-              />
-            </div>
+  // File tree sidebar content (reused for both desktop and mobile drawer)
+  const fileTreeContent = (
+    <>
+      {/* Fixed header showing current path */}
+      <div className="shrink-0 px-2 py-2 border-b border-slate-800/50 bg-slate-900/50">
+        <div className="flex items-center justify-between gap-1.5 text-emerald-400 font-medium text-sm">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span>📁</span>
+            <span className="truncate">
+              {cwd === '/' ? process.env.NEXT_PUBLIC_NAME : `${process.env.NEXT_PUBLIC_NAME}${cwd}`}
+            </span>
           </div>
+          {isMobile && (
+            <button onClick={() => setDrawerOpen(false)} className="text-slate-400 hover:text-white p-1">
+              <X size={16} />
+            </button>
+          )}
+        </div>
+      </div>
+      {/* Scrollable file list */}
+      <div className="flex-1 overflow-auto green-scroll p-2 min-h-0">
+        <FileTree 
+          tree={fileSystem} 
+          onOpenFile={handleOpenFile} 
+          showRoot={false} 
+          currentPath={cwd}
+        />
+      </div>
+    </>
+  );
 
-          {/* Resize handle */}
-          <div
-            className="cursor-col-resize bg-slate-800/70 hover:bg-slate-700/80 transition-colors"
-            onMouseDown={startResize}
-            title="Drag to resize"
-          />
+  // Shared rendered output — computed once, used in both mobile and desktop layouts
+  const renderedOutput = (
+    <div className="font-mono text-sm space-y-0.5">
+      {output.map((line, i) => {
+        // Handle PROJECT_CARD for project files
+        if (line.startsWith('§PROJECT_CARD§')) {
+          try {
+            const data = JSON.parse(line.replace('§PROJECT_CARD§', ''));
+            const { title, content, githubUrl } = data;
+            const contentLines = content.split('\n');
+            
+            // Parse sections
+            const sections: { [key: string]: string[] } = {};
+            let currentSection = 'description';
+            sections[currentSection] = [];
+            
+            contentLines.forEach((l: string) => {
+              if (l.match(/^\[.+\]$/)) {
+                currentSection = l.replace(/[\[\]]/g, '').toLowerCase();
+                sections[currentSection] = [];
+              } else if (l.startsWith('•') || l.startsWith('- ')) {
+                sections[currentSection]?.push(l.replace(/^[•\-]\s*/, ''));
+              } else if (l && !l.startsWith('===') && !l.includes('GitHub:') && !l.includes('github.com')) {
+                sections[currentSection]?.push(l);
+              }
+            });
 
-          {/* Main terminal area */}
-          <div className="flex flex-col min-w-0 min-h-0">
-            {/* Output area */}
-            <div className="flex-1 overflow-auto green-scroll p-3 min-h-0" ref={outputRef}>
-              <div className="font-mono text-sm space-y-0.5">
-                {output.map((line, i) => {
-                  // Handle PROJECT_CARD for project files
-                  if (line.startsWith('§PROJECT_CARD§')) {
-                    try {
-                      const data = JSON.parse(line.replace('§PROJECT_CARD§', ''));
-                      const { title, content, githubUrl } = data;
-                      const contentLines = content.split('\n');
-                      
-                      // Parse sections
-                      const sections: { [key: string]: string[] } = {};
-                      let currentSection = 'description';
-                      sections[currentSection] = [];
-                      
-                      contentLines.forEach((l: string) => {
-                        if (l.match(/^\[.+\]$/)) {
-                          currentSection = l.replace(/[\[\]]/g, '').toLowerCase();
-                          sections[currentSection] = [];
-                        } else if (l.startsWith('•') || l.startsWith('- ')) {
-                          sections[currentSection]?.push(l.replace(/^[•\-]\s*/, ''));
-                        } else if (l && !l.startsWith('===') && !l.includes('GitHub:') && !l.includes('github.com')) {
-                          sections[currentSection]?.push(l);
-                        }
-                      });
+            return (
+              <div key={i} className="my-4 stagger-fade-in">
+                {/* Project Card */}
+                <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-4 sm:p-6 backdrop-blur-md card-glow card-accent-border relative overflow-hidden">
+                  {/* Ambient background glow inside the card */}
+                  <div className="absolute -top-12 -right-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
+                  {/* Header */}
+                  <div className="flex items-start justify-between gap-3 sm:gap-4 mb-3 sm:mb-4">
+                    <h3 className="text-lg sm:text-xl font-bold text-emerald-400 flex-1">
+                      {title}
+                    </h3>
+                    {/* Rotating Project Icon with Link */}
+                    {githubUrl && (
+                      <a 
+                        href={githubUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="group flex flex-col items-center gap-1 sm:gap-2 shrink-0"
+                      >
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 flex items-center justify-center group-hover:border-emerald-400/60 transition-all duration-300">
+                          <Cpu 
+                            size={24} 
+                            className="text-emerald-400 group-hover:text-emerald-300 group-hover:animate-spin transition-colors sm:w-8 sm:h-8" 
+                            style={{ animationDuration: '2s' }}
+                          />
+                        </div>
+                        <span className="text-[10px] sm:text-xs text-slate-400 group-hover:text-emerald-400 flex items-center gap-1 transition-colors">
+                          <ExternalLink size={10} />
+                          View
+                        </span>
+                      </a>
+                    )}
+                  </div>
+                  
+                  {/* Description */}
+                  {sections.description?.filter(d => d.trim()).length > 0 && (
+                    <p className="text-slate-300 mb-3 sm:mb-4 leading-relaxed text-xs sm:text-sm">
+                      {sections.description.filter(d => d.trim()).join(' ')}
+                    </p>
+                  )}
+                  
+                  {/* Technologies */}
+                  {sections.technologies?.length > 0 && (
+                    <div className="mb-3 sm:mb-4">
+                      <h4 className="text-cyan-400 font-semibold text-xs sm:text-sm mb-2 sm:mb-3">Technologies</h4>
+                      <div className="flex flex-wrap gap-2 sm:gap-3">
+                        {sections.technologies.map((tech, idx) => (
+                          <TechIcon key={idx} tech={tech} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Features or Research Contributions */}
+                  {(sections.features?.length > 0 || sections['research contributions']?.length > 0) && (
+                    <div className="mb-3 sm:mb-4">
+                      <h4 className="text-cyan-400 font-semibold text-xs sm:text-sm mb-2">
+                        {sections['research contributions']?.length > 0 ? 'Research Contributions' : 'Features'}
+                      </h4>
+                      <ul className="space-y-1">
+                        {(sections.features || sections['research contributions'] || []).map((feature, idx) => (
+                          <li key={idx} className="text-slate-300 text-xs sm:text-sm flex items-start gap-2">
+                            <span className="text-emerald-500 mt-0.5">›</span>
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* Research section */}
+                  {sections.research?.length > 0 && (
+                    <div className="mb-3 sm:mb-4">
+                      <h4 className="text-blue-400 font-semibold text-xs sm:text-sm mb-2">📝 Research</h4>
+                      <div className="space-y-1 pl-2">
+                        {sections.research.map((item, idx) => (
+                          <p key={idx} className="text-blue-300/80 text-xs sm:text-sm">{item}</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Awards if any */}
+                  {sections.awards?.length > 0 && (
+                    <div className="mb-3 sm:mb-4">
+                      <h4 className="text-yellow-400 font-semibold text-xs sm:text-sm mb-2">🏆 Awards</h4>
+                      {sections.awards.map((award, idx) => (
+                        <p key={idx} className="text-yellow-300/80 text-xs sm:text-sm">{award}</p>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Status if any */}
+                  {sections.status?.length > 0 && (
+                    <div className="mb-2">
+                      <span className="px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30">
+                        {sections.status.join(' ').replace(/📝\s*/, '')}
+                      </span>
+                    </div>
+                  )}
 
+                </div>
+              </div>
+            );
+          } catch {
+            return <div key={i} className="text-red-400">Error parsing project data</div>;
+          }
+        }
+        
+        // Handle FILE_CARD for all other files
+        if (line.startsWith('§FILE_CARD§')) {
+          try {
+            const data = JSON.parse(line.replace('§FILE_CARD§', ''));
+            const { title, content, fileType } = data;
+            const contentLines = content.split('\n').filter((l: string) => !l.startsWith('==='));
+            
+            // Get file type icon
+            const getFileIcon = () => {
+              switch(fileType) {
+                case 'about': return <User size={28} className="text-emerald-400" />;
+                case 'education': return <GraduationCap size={28} className="text-blue-400" />;
+                case 'experience': return <Briefcase size={28} className="text-purple-400" />;
+                case 'skills': return <Code size={28} className="text-cyan-400" />;
+                case 'contact': return <Mail size={28} className="text-rose-400" />;
+                case 'achievements': return <Trophy size={28} className="text-yellow-400" />;
+                case 'certifications': return <Award size={28} className="text-orange-400" />;
+                case 'readme': return <BookOpen size={28} className="text-emerald-400" />;
+                default: return <FileText size={28} className="text-slate-400" />;
+              }
+            };
+            
+            // Parse content into sections
+            const sections: { name: string; items: string[] }[] = [];
+            let currentSection = { name: 'content', items: [] as string[] };
+            
+            contentLines.forEach((l: string) => {
+              if (l.match(/^\[.+\]$/)) {
+                if (currentSection.items.length > 0) sections.push(currentSection);
+                currentSection = { name: l.replace(/[\[\]]/g, ''), items: [] };
+              } else if (l.trim()) {
+                currentSection.items.push(l);
+              }
+            });
+            if (currentSection.items.length > 0) sections.push(currentSection);
+
+            // Neural network animation component for About card
+            const NeuralNetworkAnimation = () => {
+              const orbitNodes = [
+                { label: 'ML', color: '#10b981', delay: '0s', angle: 0 },
+                { label: 'CV', color: '#3b82f6', delay: '0.5s', angle: 72 },
+                { label: 'NLP', color: '#8b5cf6', delay: '1s', angle: 144 },
+                { label: 'Web', color: '#06b6d4', delay: '1.5s', angle: 216 },
+                { label: 'Data', color: '#f59e0b', delay: '2s', angle: 288 },
+              ];
+
+              return (
+                <div className="relative w-full h-full min-h-[280px] flex items-center justify-center">
+                  {/* Outer orbit ring */}
+                  <div className="absolute w-56 h-56 rounded-full border border-slate-600/20 animate-orbit">
+                    {orbitNodes.map((node, idx) => {
+                      const rad = (node.angle * Math.PI) / 180;
+                      const x = Math.cos(rad) * 112;
+                      const y = Math.sin(rad) * 112;
                       return (
-                        <div key={i} className="my-4 stagger-fade-in">
-                          {/* Project Card */}
-                          <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-6 backdrop-blur-md card-glow card-accent-border relative overflow-hidden">
-                            {/* Ambient background glow inside the card */}
-                            <div className="absolute -top-12 -right-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
-                            {/* Header */}
-                            <div className="flex items-start justify-between gap-4 mb-4">
-                              <h3 className="text-xl font-bold text-emerald-400 flex-1">
-                                {title}
-                              </h3>
-                              {/* Rotating Project Icon with Link */}
-                              {githubUrl && (
-                                <a 
-                                  href={githubUrl} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="group flex flex-col items-center gap-2"
-                                >
-                                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 flex items-center justify-center group-hover:border-emerald-400/60 transition-all duration-300">
-                                    <Cpu 
-                                      size={32} 
-                                      className="text-emerald-400 group-hover:text-emerald-300 group-hover:animate-spin transition-colors" 
-                                      style={{ animationDuration: '2s' }}
-                                    />
-                                  </div>
-                                  <span className="text-xs text-slate-400 group-hover:text-emerald-400 flex items-center gap-1 transition-colors">
-                                    <ExternalLink size={12} />
-                                    View Project
-                                  </span>
-                                </a>
-                              )}
-                            </div>
-                            
-                            {/* Description */}
-                            {sections.description?.filter(d => d.trim()).length > 0 && (
-                              <p className="text-slate-300 mb-4 leading-relaxed">
-                                {sections.description.filter(d => d.trim()).join(' ')}
-                              </p>
-                            )}
-                            
-                            {/* Technologies */}
-                            {sections.technologies?.length > 0 && (
-                              <div className="mb-4">
-                                <h4 className="text-cyan-400 font-semibold text-sm mb-3">Technologies</h4>
-                                <div className="flex flex-wrap gap-3">
-                                  {sections.technologies.map((tech, idx) => (
-                                    <TechIcon key={idx} tech={tech} />
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                            
-                            {/* Features or Research Contributions */}
-                            {(sections.features?.length > 0 || sections['research contributions']?.length > 0) && (
-                              <div className="mb-4">
-                                <h4 className="text-cyan-400 font-semibold text-sm mb-2">
-                                  {sections['research contributions']?.length > 0 ? 'Research Contributions' : 'Features'}
-                                </h4>
-                                <ul className="space-y-1">
-                                  {(sections.features || sections['research contributions'] || []).map((feature, idx) => (
-                                    <li key={idx} className="text-slate-300 text-sm flex items-start gap-2">
-                                      <span className="text-emerald-500 mt-0.5">›</span>
-                                      <span>{feature}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                            
-                            {/* Research section */}
-                            {sections.research?.length > 0 && (
-                              <div className="mb-4">
-                                <h4 className="text-blue-400 font-semibold text-sm mb-2">📝 Research</h4>
-                                <div className="space-y-1 pl-2">
-                                  {sections.research.map((item, idx) => (
-                                    <p key={idx} className="text-blue-300/80 text-sm">{item}</p>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                            
-                            {/* Awards if any */}
-                            {sections.awards?.length > 0 && (
-                              <div className="mb-4">
-                                <h4 className="text-yellow-400 font-semibold text-sm mb-2">🏆 Awards</h4>
-                                {sections.awards.map((award, idx) => (
-                                  <p key={idx} className="text-yellow-300/80 text-sm">{award}</p>
-                                ))}
-                              </div>
-                            )}
-                            
-                            {/* Status if any */}
-                            {sections.status?.length > 0 && (
-                              <div className="mb-2">
-                                <span className="px-3 py-1 text-xs bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30">
-                                  {sections.status.join(' ').replace(/📝\s*/, '')}
-                                </span>
-                              </div>
-                            )}
-
+                        <div
+                          key={idx}
+                          className="absolute animate-node-pulse"
+                          style={{
+                            left: `calc(50% + ${x}px - 16px)`,
+                            top: `calc(50% + ${y}px - 16px)`,
+                            color: node.color,
+                            animationDelay: node.delay,
+                          }}
+                        >
+                          <div
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold border animate-orbit-reverse"
+                            style={{
+                              backgroundColor: `${node.color}15`,
+                              borderColor: `${node.color}40`,
+                              color: node.color,
+                            }}
+                          >
+                            {node.label}
                           </div>
                         </div>
                       );
-                    } catch {
-                      return <div key={i} className="text-red-400">Error parsing project data</div>;
-                    }
-                  }
-                  
-                  // Handle FILE_CARD for all other files
-                  if (line.startsWith('§FILE_CARD§')) {
-                    try {
-                      const data = JSON.parse(line.replace('§FILE_CARD§', ''));
-                      const { title, content, fileType } = data;
-                      const contentLines = content.split('\n').filter((l: string) => !l.startsWith('==='));
-                      
-                      // Get file type icon
-                      const getFileIcon = () => {
-                        switch(fileType) {
-                          case 'about': return <User size={28} className="text-emerald-400" />;
-                          case 'education': return <GraduationCap size={28} className="text-blue-400" />;
-                          case 'experience': return <Briefcase size={28} className="text-purple-400" />;
-                          case 'skills': return <Code size={28} className="text-cyan-400" />;
-                          case 'contact': return <Mail size={28} className="text-rose-400" />;
-                          case 'achievements': return <Trophy size={28} className="text-yellow-400" />;
-                          case 'certifications': return <Award size={28} className="text-orange-400" />;
-                          case 'readme': return <BookOpen size={28} className="text-emerald-400" />;
-                          default: return <FileText size={28} className="text-slate-400" />;
-                        }
-                      };
-                      
-                      // Parse content into sections
-                      const sections: { name: string; items: string[] }[] = [];
-                      let currentSection = { name: 'content', items: [] as string[] };
-                      
-                      contentLines.forEach((l: string) => {
-                        if (l.match(/^\[.+\]$/)) {
-                          if (currentSection.items.length > 0) sections.push(currentSection);
-                          currentSection = { name: l.replace(/[\[\]]/g, ''), items: [] };
-                        } else if (l.trim()) {
-                          currentSection.items.push(l);
-                        }
-                      });
-                      if (currentSection.items.length > 0) sections.push(currentSection);
+                    })}
+                  </div>
 
-                      // Neural network animation component for About card
-                      const NeuralNetworkAnimation = () => {
-                        const orbitNodes = [
-                          { label: 'ML', color: '#10b981', delay: '0s', angle: 0 },
-                          { label: 'CV', color: '#3b82f6', delay: '0.5s', angle: 72 },
-                          { label: 'NLP', color: '#8b5cf6', delay: '1s', angle: 144 },
-                          { label: 'Web', color: '#06b6d4', delay: '1.5s', angle: 216 },
-                          { label: 'Data', color: '#f59e0b', delay: '2s', angle: 288 },
-                        ];
+                  {/* Middle orbit ring */}
+                  <div className="absolute w-36 h-36 rounded-full border border-emerald-500/10 animate-orbit-reverse" />
 
+                  {/* Inner orbit ring */}
+                  <div className="absolute w-20 h-20 rounded-full border border-emerald-500/20 animate-orbit-slow" />
+
+                  {/* Connection lines (SVG) */}
+                  <svg className="absolute w-56 h-56 animate-connection-glow" viewBox="-112 -112 224 224">
+                    {orbitNodes.map((node, idx) => {
+                      const rad = (node.angle * Math.PI) / 180;
+                      const x = Math.cos(rad) * 112;
+                      const y = Math.sin(rad) * 112;
+                      return (
+                        <line
+                          key={idx}
+                          x1="0" y1="0"
+                          x2={x} y2={y}
+                          stroke={node.color}
+                          strokeWidth="0.5"
+                          strokeDasharray="4 4"
+                          style={{
+                            animation: `dataFlow 2s linear infinite`,
+                            animationDelay: node.delay,
+                          }}
+                        />
+                      );
+                    })}
+                    {/* Cross connections */}
+                    {orbitNodes.map((node, idx) => {
+                      const nextNode = orbitNodes[(idx + 2) % orbitNodes.length];
+                      const rad1 = (node.angle * Math.PI) / 180;
+                      const rad2 = (nextNode.angle * Math.PI) / 180;
+                      return (
+                        <line
+                          key={`cross-${idx}`}
+                          x1={Math.cos(rad1) * 112}
+                          y1={Math.sin(rad1) * 112}
+                          x2={Math.cos(rad2) * 112}
+                          y2={Math.sin(rad2) * 112}
+                          stroke="rgba(100, 200, 180, 0.08)"
+                          strokeWidth="0.5"
+                        />
+                      );
+                    })}
+                  </svg>
+
+                  {/* Core center node */}
+                  <div className="relative z-10 w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-600/20 border border-emerald-500/30 flex items-center justify-center animate-core-glow animate-float">
+                    <Brain size={28} className="text-emerald-400" />
+                  </div>
+
+                  {/* Floating particles */}
+                  {[...Array(6)].map((_, idx) => (
+                    <div
+                      key={`particle-${idx}`}
+                      className="absolute w-1 h-1 rounded-full bg-emerald-400/40 animate-float"
+                      style={{
+                        left: `${20 + ((idx * 17) % 61)}%`,
+                        top: `${20 + ((idx * 23) % 61)}%`,
+                        animationDelay: `${idx * 0.7}s`,
+                        animationDuration: `${3 + ((idx * 7) % 3)}s`,
+                      }}
+                    />
+                  ))}
+                </div>
+              );
+            };
+
+            // Render content section helper
+            const renderContentSections = (sections: { name: string; items: string[] }[]) => (
+              <div className="space-y-3 sm:space-y-4">
+                {sections.map((section, sIdx) => (
+                  <div key={sIdx}>
+                    {section.name !== 'content' && (
+                      <h4 className="text-cyan-400 font-semibold text-xs sm:text-sm mb-2">{section.name}</h4>
+                    )}
+                    <div className="space-y-1">
+                      {section.items.map((item, iIdx) => {
+                        if (item.startsWith('•') || item.startsWith('- ')) {
+                          return (
+                            <div key={iIdx} className="text-slate-300 text-xs sm:text-sm flex items-start gap-2 pl-2">
+                              <span className="text-emerald-500 mt-0.5">›</span>
+                              <span>{item.replace(/^[•\-]\s*/, '')}</span>
+                            </div>
+                          );
+                        }
+                        if (item.match(/^[🏆🥈🥉🏅📜⭐🎓📧📱📍🔗]/)) {
+                          return (
+                            <div key={iIdx} className="text-slate-200 text-xs sm:text-sm py-1">{item}</div>
+                          );
+                        }
+                        if (item.match(/████/)) {
+                          const parts = item.split(/\s{2,}/);
+                          const skillName = parts[0]?.trim() || '';
+                          const percentMatch = item.match(/\d+%/);
+                          const percentStr = percentMatch ? percentMatch[0] : '80%';
+                          const percentValue = parseInt(percentStr) || 80;
+                          return (
+                            <div key={iIdx} className="space-y-1.5 my-3 max-w-md stagger-fade-in">
+                              <div className="flex justify-between items-center text-xs">
+                                <span className="text-slate-300 font-semibold font-mono">{skillName}</span>
+                                <span className="text-emerald-400 font-bold font-mono">{percentStr}</span>
+                              </div>
+                              <div className="h-2 w-full bg-slate-950/60 rounded-full overflow-hidden border border-slate-800/60 relative">
+                                <div 
+                                  className="h-full skill-bar-fill rounded-full" 
+                                  style={{ 
+                                    '--fill-width': `${percentValue}%`,
+                                    width: `${percentValue}%` 
+                                  } as React.CSSProperties} 
+                                />
+                              </div>
+                            </div>
+                          );
+                        }
+                        if (item.includes('github.com') || item.includes('linkedin.com') || item.includes('@')) {
+                          return (
+                            <div key={iIdx} className="text-blue-400 text-xs sm:text-sm hover:text-blue-300 break-all">{item}</div>
+                          );
+                        }
+                        if (item.match(/^━+$/)) {
+                          return <div key={iIdx} className="border-t border-slate-700/50 my-2" />;
+                        }
                         return (
-                          <div className="relative w-full h-full min-h-[280px] flex items-center justify-center">
-                            {/* Outer orbit ring */}
-                            <div className="absolute w-56 h-56 rounded-full border border-slate-600/20 animate-orbit">
-                              {orbitNodes.map((node, idx) => {
-                                const rad = (node.angle * Math.PI) / 180;
-                                const x = Math.cos(rad) * 112;
-                                const y = Math.sin(rad) * 112;
+                          <div key={iIdx} className="text-slate-300 text-xs sm:text-sm leading-relaxed">{item}</div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+
+            // Skills card renders grouping in cards with chip badges (no percentages or bars)
+            if (fileType === 'skills') {
+              return (
+                <div key={i} className="my-4 stagger-fade-in">
+                  <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-4 sm:p-6 backdrop-blur-md card-glow card-accent-border relative overflow-hidden">
+                    {/* Ambient background glow inside the card */}
+                    <div className="absolute -top-12 -right-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
+                    {/* Header */}
+                    <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4 pb-3 sm:pb-4 border-b border-slate-700/50">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/30 flex items-center justify-center">
+                        {getFileIcon()}
+                      </div>
+                      <h3 className="text-lg sm:text-xl font-bold text-emerald-400">{title}</h3>
+                    </div>
+                    
+                    {/* Skills Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                      {sections.map((section, sIdx) => {
+                        // Skip default content section if empty
+                        if (section.name === 'content' && section.items.length === 0) return null;
+                        const sectionTitle = section.name === 'content' ? 'General' : section.name;
+                        return (
+                          <div key={sIdx} className="bg-slate-950/45 rounded-lg border border-slate-800/70 p-3 sm:p-4 hover:border-slate-700/50 transition-colors">
+                            <h4 className="text-cyan-400 font-semibold text-[10px] sm:text-xs uppercase tracking-wider mb-2 sm:mb-3 flex items-center gap-1.5 font-mono">
+                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block animate-pulse" />
+                              {sectionTitle}
+                            </h4>
+                            <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                              {section.items.map((item, iIdx) => {
+                                const cleanItem = item.replace(/^[•\-]\s*/, '').trim();
                                 return (
-                                  <div
-                                    key={idx}
-                                    className="absolute animate-node-pulse"
-                                    style={{
-                                      left: `calc(50% + ${x}px - 16px)`,
-                                      top: `calc(50% + ${y}px - 16px)`,
-                                      color: node.color,
-                                      animationDelay: node.delay,
-                                    }}
+                                  <div 
+                                    key={iIdx} 
+                                    className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded bg-slate-900/60 border border-slate-800/80 hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all text-slate-300 hover:text-emerald-300 text-[10px] sm:text-xs font-mono flex items-center gap-1 sm:gap-1.5 hover:scale-[1.03] cursor-default"
                                   >
-                                    <div
-                                      className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold border animate-orbit-reverse"
-                                      style={{
-                                        backgroundColor: `${node.color}15`,
-                                        borderColor: `${node.color}40`,
-                                        color: node.color,
-                                      }}
-                                    >
-                                      {node.label}
-                                    </div>
+                                    <span className="w-1 h-1 rounded-full bg-emerald-500/60" />
+                                    {cleanItem}
                                   </div>
                                 );
                               })}
                             </div>
-
-                            {/* Middle orbit ring */}
-                            <div className="absolute w-36 h-36 rounded-full border border-emerald-500/10 animate-orbit-reverse" />
-
-                            {/* Inner orbit ring */}
-                            <div className="absolute w-20 h-20 rounded-full border border-emerald-500/20 animate-orbit-slow" />
-
-                            {/* Connection lines (SVG) */}
-                            <svg className="absolute w-56 h-56 animate-connection-glow" viewBox="-112 -112 224 224">
-                              {orbitNodes.map((node, idx) => {
-                                const rad = (node.angle * Math.PI) / 180;
-                                const x = Math.cos(rad) * 112;
-                                const y = Math.sin(rad) * 112;
-                                return (
-                                  <line
-                                    key={idx}
-                                    x1="0" y1="0"
-                                    x2={x} y2={y}
-                                    stroke={node.color}
-                                    strokeWidth="0.5"
-                                    strokeDasharray="4 4"
-                                    style={{
-                                      animation: `dataFlow 2s linear infinite`,
-                                      animationDelay: node.delay,
-                                    }}
-                                  />
-                                );
-                              })}
-                              {/* Cross connections */}
-                              {orbitNodes.map((node, idx) => {
-                                const nextNode = orbitNodes[(idx + 2) % orbitNodes.length];
-                                const rad1 = (node.angle * Math.PI) / 180;
-                                const rad2 = (nextNode.angle * Math.PI) / 180;
-                                return (
-                                  <line
-                                    key={`cross-${idx}`}
-                                    x1={Math.cos(rad1) * 112}
-                                    y1={Math.sin(rad1) * 112}
-                                    x2={Math.cos(rad2) * 112}
-                                    y2={Math.sin(rad2) * 112}
-                                    stroke="rgba(100, 200, 180, 0.08)"
-                                    strokeWidth="0.5"
-                                  />
-                                );
-                              })}
-                            </svg>
-
-                            {/* Core center node */}
-                            <div className="relative z-10 w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-600/20 border border-emerald-500/30 flex items-center justify-center animate-core-glow animate-float">
-                              <Brain size={28} className="text-emerald-400" />
-                            </div>
-
-                            {/* Floating particles */}
-                            {[...Array(6)].map((_, idx) => (
-                              <div
-                                key={`particle-${idx}`}
-                                className="absolute w-1 h-1 rounded-full bg-emerald-400/40 animate-float"
-                                style={{
-                                  left: `${20 + Math.random() * 60}%`,
-                                  top: `${20 + Math.random() * 60}%`,
-                                  animationDelay: `${idx * 0.7}s`,
-                                  animationDuration: `${3 + Math.random() * 2}s`,
-                                }}
-                              />
-                            ))}
                           </div>
                         );
-                      };
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
 
-                      // Render content section helper
-                      const renderContentSections = (sections: { name: string; items: string[] }[]) => (
-                        <div className="space-y-4">
-                          {sections.map((section, sIdx) => (
-                            <div key={sIdx}>
-                              {section.name !== 'content' && (
-                                <h4 className="text-cyan-400 font-semibold text-sm mb-2">{section.name}</h4>
-                              )}
-                              <div className="space-y-1">
-                                {section.items.map((item, iIdx) => {
-                                  if (item.startsWith('•') || item.startsWith('- ')) {
-                                    return (
-                                      <div key={iIdx} className="text-slate-300 text-sm flex items-start gap-2 pl-2">
-                                        <span className="text-emerald-500 mt-0.5">›</span>
-                                        <span>{item.replace(/^[•\-]\s*/, '')}</span>
-                                      </div>
-                                    );
-                                  }
-                                  if (item.match(/^[🏆🥈🥉🏅📜⭐🎓📧📱📍🔗]/)) {
-                                    return (
-                                      <div key={iIdx} className="text-slate-200 text-sm py-1">{item}</div>
-                                    );
-                                  }
-                                  if (item.match(/████/)) {
-                                    const parts = item.split(/\s{2,}/);
-                                    const skillName = parts[0]?.trim() || '';
-                                    const percentMatch = item.match(/\d+%/);
-                                    const percentStr = percentMatch ? percentMatch[0] : '80%';
-                                    const percentValue = parseInt(percentStr) || 80;
-                                    return (
-                                      <div key={iIdx} className="space-y-1.5 my-3 max-w-md stagger-fade-in">
-                                        <div className="flex justify-between items-center text-xs">
-                                          <span className="text-slate-300 font-semibold font-mono">{skillName}</span>
-                                          <span className="text-emerald-400 font-bold font-mono">{percentStr}</span>
-                                        </div>
-                                        <div className="h-2 w-full bg-slate-950/60 rounded-full overflow-hidden border border-slate-800/60 relative">
-                                          <div 
-                                            className="h-full skill-bar-fill rounded-full" 
-                                            style={{ 
-                                              '--fill-width': `${percentValue}%`,
-                                              width: `${percentValue}%` 
-                                            } as React.CSSProperties} 
-                                          />
-                                        </div>
-                                      </div>
-                                    );
-                                  }
-                                  if (item.includes('github.com') || item.includes('linkedin.com') || item.includes('@')) {
-                                    return (
-                                      <div key={iIdx} className="text-blue-400 text-sm hover:text-blue-300">{item}</div>
-                                    );
-                                  }
-                                  if (item.match(/^━+$/)) {
-                                    return <div key={iIdx} className="border-t border-slate-700/50 my-2" />;
-                                  }
-                                  return (
-                                    <div key={iIdx} className="text-slate-300 text-sm leading-relaxed">{item}</div>
-                                  );
-                                })}
-                              </div>
+            // About card uses two-column layout with animation
+            if (fileType === 'about') {
+              return (
+                <div key={i} className="my-4 stagger-fade-in">
+                  <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-4 sm:p-6 backdrop-blur-md card-glow card-accent-border relative overflow-hidden">
+                    {/* Ambient background glow inside the card */}
+                    <div className="absolute -top-12 -right-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
+                    {/* Header */}
+                    <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4 pb-3 sm:pb-4 border-b border-slate-700/50">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/30 flex items-center justify-center">
+                        {getFileIcon()}
+                      </div>
+                      <h3 className="text-lg sm:text-xl font-bold text-emerald-400">{title}</h3>
+                    </div>
+                    
+                    {/* Two-column: Content + Animation */}
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-4 sm:gap-6">
+                      {/* Left: Content */}
+                      {renderContentSections(sections)}
+                      
+                      {/* Right: Neural Network Animation */}
+                      <div className="hidden md:flex items-center justify-center">
+                        <NeuralNetworkAnimation />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            // Experience card uses timeline
+            if (fileType === 'experience') {
+              // Parse experience entries from sections
+              const experienceEntries: { period: string; role: string; company: string; details: string[] }[] = [];
+              let currentEntry: { period: string; role: string; company: string; details: string[] } | null = null;
+
+              sections.forEach(section => {
+                if (section.name !== 'content') {
+                  const items = section.items.filter(it => it.trim());
+                  currentEntry = {
+                    period: section.name,
+                    role: items[0] || '',
+                    company: items[1] || '',
+                    details: items.slice(2).map(d => d.replace(/^[•\-]\s*/, '')),
+                  };
+                  experienceEntries.push(currentEntry);
+                } else {
+                  let tempEntry: { period: string; role: string; company: string; details: string[] } | null = null;
+                  section.items.forEach(item => {
+                    if (tempEntry) {
+                      if (item.startsWith('•') || item.startsWith('- ')) {
+                        tempEntry.details.push(item.replace(/^[•\-]\s*/, ''));
+                      } else if (!tempEntry.company) {
+                        tempEntry.company = item;
+                      } else {
+                        experienceEntries.push(tempEntry);
+                        tempEntry = { period: '', role: item, company: '', details: [] };
+                      }
+                    } else {
+                      tempEntry = { period: '', role: item, company: '', details: [] };
+                    }
+                  });
+                  if (tempEntry && (tempEntry as { role: string }).role) {
+                    experienceEntries.push(tempEntry);
+                  }
+                }
+              });
+
+              const nodeColors = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+
+              // Reusable window card renderer
+              const renderWindowCard = (
+                entry: { period: string; role: string; company: string; details: string[] },
+                color: string,
+                fadeDelay: string,
+                shimmerDelay: string,
+              ) => (
+                <div
+                  className="animate-window-fade h-full"
+                  style={{ animationDelay: fadeDelay }}
+                >
+                  <div
+                    className="rounded-lg border overflow-hidden animate-window-shimmer backdrop-blur-sm h-full"
+                    style={{
+                      borderColor: `${color}40`,
+                      backgroundColor: `${color}08`,
+                      animationDelay: shimmerDelay,
+                    }}
+                  >
+                    {/* Title bar */}
+                    <div
+                      className="flex items-center justify-between px-2 sm:px-3 py-1 sm:py-1.5"
+                      style={{ backgroundColor: `${color}15`, borderBottom: `1px solid ${color}25` }}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full" style={{ backgroundColor: `${color}80` }} />
+                        <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full" style={{ backgroundColor: `${color}40` }} />
+                      </div>
+                      <span className="text-[9px] sm:text-[10px] font-mono opacity-70" style={{ color }}>{entry.period}</span>
+                      <span className="text-[10px] sm:text-xs opacity-50" style={{ color }}>✕</span>
+                    </div>
+                    {/* Body */}
+                    <div className="px-2.5 sm:px-3.5 py-2 sm:py-3">
+                      <div className="text-xs sm:text-sm font-semibold leading-tight" style={{ color }}>{entry.role}</div>
+                      <div className="text-[10px] sm:text-xs text-slate-400 mt-1">{entry.company}</div>
+                      {entry.details.length > 0 && (
+                        <div className="mt-1.5 sm:mt-2 space-y-0.5 sm:space-y-1">
+                          {entry.details.map((d, dIdx) => (
+                            <div key={dIdx} className="text-[10px] sm:text-[11px] text-slate-400 flex items-start gap-1 sm:gap-1.5">
+                              <span style={{ color }} className="mt-px text-[10px] sm:text-xs">›</span>
+                              <span>{d}</span>
                             </div>
                           ))}
                         </div>
-                      );
-
-                      // Skills card renders grouping in cards with chip badges (no percentages or bars)
-                      if (fileType === 'skills') {
-                        return (
-                          <div key={i} className="my-4 stagger-fade-in">
-                            <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-6 backdrop-blur-md card-glow card-accent-border relative overflow-hidden">
-                              {/* Ambient background glow inside the card */}
-                              <div className="absolute -top-12 -right-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
-                              {/* Header */}
-                              <div className="flex items-center gap-4 mb-4 pb-4 border-b border-slate-700/50">
-                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/30 flex items-center justify-center">
-                                  {getFileIcon()}
-                                </div>
-                                <h3 className="text-xl font-bold text-emerald-400">{title}</h3>
-                              </div>
-                              
-                              {/* Skills Grid */}
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {sections.map((section, sIdx) => {
-                                  // Skip default content section if empty
-                                  if (section.name === 'content' && section.items.length === 0) return null;
-                                  const sectionTitle = section.name === 'content' ? 'General' : section.name;
-                                  return (
-                                    <div key={sIdx} className="bg-slate-950/45 rounded-lg border border-slate-800/70 p-4 hover:border-slate-700/50 transition-colors">
-                                      <h4 className="text-cyan-400 font-semibold text-xs uppercase tracking-wider mb-3 flex items-center gap-1.5 font-mono">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block animate-pulse" />
-                                        {sectionTitle}
-                                      </h4>
-                                      <div className="flex flex-wrap gap-2">
-                                        {section.items.map((item, iIdx) => {
-                                          const cleanItem = item.replace(/^[•\-]\s*/, '').trim();
-                                          return (
-                                            <div 
-                                              key={iIdx} 
-                                              className="px-2.5 py-1 rounded bg-slate-900/60 border border-slate-800/80 hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all text-slate-300 hover:text-emerald-300 text-xs font-mono flex items-center gap-1.5 hover:scale-[1.03] cursor-default"
-                                            >
-                                              <span className="w-1 h-1 rounded-full bg-emerald-500/60" />
-                                              {cleanItem}
-                                            </div>
-                                          );
-                                        })}
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      }
-
-                      // About card uses two-column layout with animation
-                      if (fileType === 'about') {
-                        return (
-                          <div key={i} className="my-4 stagger-fade-in">
-                            <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-6 backdrop-blur-md card-glow card-accent-border relative overflow-hidden">
-                              {/* Ambient background glow inside the card */}
-                              <div className="absolute -top-12 -right-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
-                              {/* Header */}
-                              <div className="flex items-center gap-4 mb-4 pb-4 border-b border-slate-700/50">
-                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/30 flex items-center justify-center">
-                                  {getFileIcon()}
-                                </div>
-                                <h3 className="text-xl font-bold text-emerald-400">{title}</h3>
-                              </div>
-                              
-                              {/* Two-column: Content + Animation */}
-                              <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-6">
-                                {/* Left: Content */}
-                                {renderContentSections(sections)}
-                                
-                                {/* Right: Neural Network Animation */}
-                                <div className="hidden md:flex items-center justify-center">
-                                  <NeuralNetworkAnimation />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      }
-
-                      // Experience card uses two-column layout with timeline tree animation
-                      if (fileType === 'experience') {
-                        // Parse experience entries from sections
-                        const experienceEntries: { period: string; role: string; company: string; details: string[] }[] = [];
-                        let currentEntry: { period: string; role: string; company: string; details: string[] } | null = null;
-
-                        sections.forEach(section => {
-                          if (section.name !== 'content') {
-                            // Section name is the time period
-                            const items = section.items.filter(it => it.trim());
-                            currentEntry = {
-                              period: section.name,
-                              role: items[0] || '',
-                              company: items[1] || '',
-                              details: items.slice(2).map(d => d.replace(/^[•\-]\s*/, '')),
-                            };
-                            experienceEntries.push(currentEntry);
-                          } else {
-                            // Parse content section for entries
-                            let tempEntry: { period: string; role: string; company: string; details: string[] } | null = null;
-                            section.items.forEach(item => {
-                              if (tempEntry) {
-                                if (item.startsWith('•') || item.startsWith('- ')) {
-                                  tempEntry.details.push(item.replace(/^[•\-]\s*/, ''));
-                                } else if (!tempEntry.company) {
-                                  tempEntry.company = item;
-                                } else {
-                                  // New entry starting
-                                  experienceEntries.push(tempEntry);
-                                  tempEntry = { period: '', role: item, company: '', details: [] };
-                                }
-                              } else {
-                                tempEntry = { period: '', role: item, company: '', details: [] };
-                              }
-                            });
-                            if (tempEntry && (tempEntry as { role: string }).role) {
-                              experienceEntries.push(tempEntry);
-                            }
-                          }
-                        });
-
-                        const nodeColors = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
-
-                        // Reusable window card renderer
-                        const renderWindowCard = (
-                          entry: { period: string; role: string; company: string; details: string[] },
-                          color: string,
-                          fadeDelay: string,
-                          shimmerDelay: string,
-                        ) => (
-                          <div
-                            className="animate-window-fade h-full"
-                            style={{ animationDelay: fadeDelay }}
-                          >
-                            <div
-                              className="rounded-lg border overflow-hidden animate-window-shimmer backdrop-blur-sm h-full"
-                              style={{
-                                borderColor: `${color}40`,
-                                backgroundColor: `${color}08`,
-                                animationDelay: shimmerDelay,
-                              }}
-                            >
-                              {/* Title bar */}
-                              <div
-                                className="flex items-center justify-between px-3 py-1.5"
-                                style={{ backgroundColor: `${color}15`, borderBottom: `1px solid ${color}25` }}
-                              >
-                                <div className="flex items-center gap-1.5">
-                                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: `${color}80` }} />
-                                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: `${color}40` }} />
-                                </div>
-                                <span className="text-[10px] font-mono opacity-70" style={{ color }}>{entry.period}</span>
-                                <span className="text-xs opacity-50" style={{ color }}>✕</span>
-                              </div>
-                              {/* Body */}
-                              <div className="px-3.5 py-3">
-                                <div className="text-sm font-semibold leading-tight" style={{ color }}>{entry.role}</div>
-                                <div className="text-xs text-slate-400 mt-1">{entry.company}</div>
-                                {entry.details.length > 0 && (
-                                  <div className="mt-2 space-y-1">
-                                    {entry.details.map((d, dIdx) => (
-                                      <div key={dIdx} className="text-[11px] text-slate-400 flex items-start gap-1.5">
-                                        <span style={{ color }} className="mt-px text-xs">›</span>
-                                        <span>{d}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        );
-
-                        // Timeline Tree — 3-column CSS grid for perfect symmetry
-                        const TimelineTreeAnimation = () => (
-                          <div className="relative w-full max-w-3xl mx-auto py-6">
-                            {/* 3-column grid: left-card | center-spine | right-card */}
-                            <div className="grid" style={{ gridTemplateColumns: 'minmax(0, 1fr) 60px minmax(0, 1fr)', gap: '0' }}>
-                              {experienceEntries.map((entry, idx) => {
-                                const isLeft = idx % 2 === 0;
-                                const color = nodeColors[idx % nodeColors.length];
-                                const fadeDelay = `${idx * 0.2}s`;
-                                const shimmerDelay = `${idx * 1}s`;
-
-                                return (
-                                  <Fragment key={idx}>
-                                    {/* Left column */}
-                                    <div className="flex items-center justify-end overflow-hidden" style={{ minHeight: '120px', paddingTop: idx > 0 ? '16px' : '0' }}>
-                                      {isLeft ? renderWindowCard(entry, color, fadeDelay, shimmerDelay) : null}
-                                    </div>
-
-                                    {/* Center column — spine + dot + arrows */}
-                                    <div className="relative flex items-center justify-center" style={{ paddingTop: idx > 0 ? '16px' : '0' }}>
-                                      {/* Vertical spine segment */}
-                                      <div className="absolute top-0 bottom-0 left-1/2 -translate-x-[1px] w-[2px]" style={{
-                                        background: `linear-gradient(to bottom, ${nodeColors[Math.max(0, idx - 1) % nodeColors.length]}60, ${color}60)`,
-                                      }} />
-
-                                      {/* Center dot */}
-                                      <div
-                                        className="relative z-10 w-4 h-4 rounded-full animate-timeline-pulse flex-shrink-0"
-                                        style={{ backgroundColor: color, color: color }}
-                                      />
-
-                                      {/* Arrow: left-pointing (card is on the left) */}
-                                      {isLeft && (
-                                        <svg className="absolute left-0 top-1/2 -translate-y-1/2" width="22" height="12" viewBox="0 0 22 12" style={{ marginTop: idx > 0 ? '8px' : '0' }}>
-                                          <line x1="22" y1="6" x2="8" y2="6" stroke={color} strokeWidth="1" strokeDasharray="4 4" className="animate-arrow-flow" style={{ animationDelay: fadeDelay }} />
-                                          <polygon points="2,6 8,2 8,10" fill={color} opacity="0.8" />
-                                        </svg>
-                                      )}
-
-                                      {/* Arrow: right-pointing (card is on the right) */}
-                                      {!isLeft && (
-                                        <svg className="absolute right-0 top-1/2 -translate-y-1/2" width="22" height="12" viewBox="0 0 22 12" style={{ marginTop: idx > 0 ? '8px' : '0' }}>
-                                          <line x1="0" y1="6" x2="14" y2="6" stroke={color} strokeWidth="1" strokeDasharray="4 4" className="animate-arrow-flow" style={{ animationDelay: fadeDelay }} />
-                                          <polygon points="20,6 14,2 14,10" fill={color} opacity="0.8" />
-                                        </svg>
-                                      )}
-                                    </div>
-
-                                    {/* Right column */}
-                                    <div className="flex items-center justify-start overflow-hidden" style={{ minHeight: '120px', paddingTop: idx > 0 ? '16px' : '0' }}>
-                                      {!isLeft ? renderWindowCard(entry, color, fadeDelay, shimmerDelay) : null}
-                                    </div>
-                                  </Fragment>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        );
-
-                        return (
-                          <div key={i} className="my-4 stagger-fade-in">
-                            <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-6 backdrop-blur-md card-glow card-accent-border relative overflow-hidden">
-                              {/* Ambient background glow inside the card */}
-                              <div className="absolute -top-12 -right-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
-                              {/* Header */}
-                              <div className="flex items-center gap-4 mb-4 pb-4 border-b border-slate-700/50">
-                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/30 flex items-center justify-center">
-                                  {getFileIcon()}
-                                </div>
-                                <h3 className="text-xl font-bold text-emerald-400">{title}</h3>
-                              </div>
-                              
-                              {/* Timeline Tree as sole content */}
-                              <TimelineTreeAnimation />
-                            </div>
-                          </div>
-                        );
-                      }
-
-                      // Default card for other file types
-                      return (
-                        <div key={i} className="my-4 stagger-fade-in">
-                          <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-6 backdrop-blur-md card-glow card-accent-border relative overflow-hidden">
-                            {/* Ambient background glow inside the card */}
-                            <div className="absolute -top-12 -right-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
-                            {/* Header */}
-                            <div className="flex items-center gap-4 mb-4 pb-4 border-b border-slate-700/50">
-                              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/30 flex items-center justify-center">
-                                {getFileIcon()}
-                              </div>
-                              <h3 className="text-xl font-bold text-emerald-400">{title}</h3>
-                            </div>
-                            
-                            {/* Content */}
-                            {renderContentSections(sections)}
-                          </div>
-                        </div>
-                      );
-                    } catch {
-                      return <div key={i} className="text-red-400">Error parsing file data</div>;
-                    }
-                  }
-                  
-                  // Handle formatted lines with markers (fallback)
-                  if (line.startsWith('§HEADER§')) {
-                    const content = line.replace('§HEADER§', '');
-                    return (
-                      <div key={i} className="py-2">
-                        <span className="text-emerald-400 font-bold text-base">{content}</span>
-                      </div>
-                    );
-                  } else if (line.startsWith('§SECTION§')) {
-                    const content = line.replace('§SECTION§', '');
-                    return (
-                      <div key={i} className="pt-3 pb-1">
-                        <span className="text-cyan-400 font-semibold">{content}</span>
-                      </div>
-                    );
-                  } else if (line.startsWith('§BULLET§')) {
-                    const content = line.replace('§BULLET§', '');
-                    return (
-                      <div key={i} className="whitespace-pre-wrap text-slate-300 pl-2">
-                        <span className="text-emerald-500">›</span>
-                        <span className="ml-1">{content.replace(/^[•\-]\s*/, '')}</span>
-                      </div>
-                    );
-                  } else if (line.startsWith('§LINK§')) {
-                    const content = line.replace('§LINK§', '');
-                    return (
-                      <div key={i} className="whitespace-pre-wrap text-blue-400 hover:text-blue-300">
-                        {content}
-                      </div>
-                    );
-                  } else if (line.startsWith('§EMOJI§')) {
-                    const content = line.replace('§EMOJI§', '');
-                    return (
-                      <div key={i} className="whitespace-pre-wrap text-slate-200 py-0.5">
-                        {content}
-                      </div>
-                    );
-                  } else if (line.startsWith('§DIVIDER§')) {
-                    return (
-                      <div key={i} className="text-slate-600 py-1">
-                        {'─'.repeat(40)}
-                      </div>
-                    );
-                  } else if (line.startsWith('§MARKDOWN_H§')) {
-                    const content = line.replace('§MARKDOWN_H§', '').replace(/^#+\s*/, '');
-                    return (
-                      <div key={i} className="py-2">
-                        <span className="text-emerald-300 font-bold text-base">{content}</span>
-                      </div>
-                    );
-                  } else if (line.startsWith('§PROGRESS§')) {
-                    const content = line.replace('§PROGRESS§', '');
-                    return (
-                      <div key={i} className="whitespace-pre-wrap font-mono">
-                        <span className="text-slate-400">{content.split(/████/)[0]}</span>
-                        <span className="text-emerald-400">{content.match(/█+/)?.[0] || ''}</span>
-                        <span className="text-slate-600">{content.match(/░+/)?.[0] || ''}</span>
-                        <span className="text-slate-400">{content.split(/[█░]+/).pop() || ''}</span>
-                      </div>
-                    );
-                  } else if (line.startsWith(`${process.env.NEXT_PUBLIC_TERMINAL_USER}@${process.env.NEXT_PUBLIC_TERMINAL_HOST}:`)) {
-                    return (
-                      <div key={i} className="whitespace-pre-wrap text-emerald-400">
-                        {line}
-                      </div>
-                    );
-                  }
-                  return (
-                    <div key={i} className="whitespace-pre-wrap text-slate-300">
-                      {line}
+                      )}
                     </div>
-                  );
-                })}
+                  </div>
+                </div>
+              );
+
+              // Mobile: single-column timeline; Desktop: alternating 3-column
+              const TimelineTreeAnimation = () => (
+                <div className="relative w-full max-w-3xl mx-auto py-4 sm:py-6">
+                  {/* Mobile: single column with spine on left */}
+                  <div className="block md:hidden">
+                    <div className="relative pl-8">
+                      {/* Vertical spine */}
+                      <div className="absolute left-3 top-0 bottom-0 w-[2px]" style={{
+                        background: `linear-gradient(to bottom, ${nodeColors[0]}60, ${nodeColors[Math.min(experienceEntries.length - 1, nodeColors.length - 1)]}60)`,
+                      }} />
+                      {experienceEntries.map((entry, idx) => {
+                        const color = nodeColors[idx % nodeColors.length];
+                        const fadeDelay = `${idx * 0.2}s`;
+                        const shimmerDelay = `${idx * 1}s`;
+                        return (
+                          <div key={idx} className="relative mb-4">
+                            {/* Dot */}
+                            <div
+                              className="absolute -left-5 top-3 w-3 h-3 rounded-full animate-timeline-pulse z-10"
+                              style={{ backgroundColor: color, color: color }}
+                            />
+                            {/* Branch line */}
+                            <div className="absolute -left-2 top-4 w-4 h-[1px]" style={{ backgroundColor: `${color}60` }} />
+                            {renderWindowCard(entry, color, fadeDelay, shimmerDelay)}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Desktop: 3-column alternating */}
+                  <div className="hidden md:block">
+                    <div className="grid" style={{ gridTemplateColumns: 'minmax(0, 1fr) 60px minmax(0, 1fr)', gap: '0' }}>
+                      {experienceEntries.map((entry, idx) => {
+                        const isLeft = idx % 2 === 0;
+                        const color = nodeColors[idx % nodeColors.length];
+                        const fadeDelay = `${idx * 0.2}s`;
+                        const shimmerDelay = `${idx * 1}s`;
+
+                        return (
+                          <Fragment key={idx}>
+                            {/* Left column */}
+                            <div className="flex items-center justify-end overflow-hidden" style={{ minHeight: '120px', paddingTop: idx > 0 ? '16px' : '0' }}>
+                              {isLeft ? renderWindowCard(entry, color, fadeDelay, shimmerDelay) : null}
+                            </div>
+
+                            {/* Center column — spine + dot + arrows */}
+                            <div className="relative flex items-center justify-center" style={{ paddingTop: idx > 0 ? '16px' : '0' }}>
+                              {/* Vertical spine segment */}
+                              <div className="absolute top-0 bottom-0 left-1/2 -translate-x-[1px] w-[2px]" style={{
+                                background: `linear-gradient(to bottom, ${nodeColors[Math.max(0, idx - 1) % nodeColors.length]}60, ${color}60)`,
+                              }} />
+
+                              {/* Center dot */}
+                              <div
+                                className="relative z-10 w-4 h-4 rounded-full animate-timeline-pulse flex-shrink-0"
+                                style={{ backgroundColor: color, color: color }}
+                              />
+
+                              {/* Arrow: left-pointing (card is on the left) */}
+                              {isLeft && (
+                                <svg className="absolute left-0 top-1/2 -translate-y-1/2" width="22" height="12" viewBox="0 0 22 12" style={{ marginTop: idx > 0 ? '8px' : '0' }}>
+                                  <line x1="22" y1="6" x2="8" y2="6" stroke={color} strokeWidth="1" strokeDasharray="4 4" className="animate-arrow-flow" style={{ animationDelay: fadeDelay }} />
+                                  <polygon points="2,6 8,2 8,10" fill={color} opacity="0.8" />
+                                </svg>
+                              )}
+
+                              {/* Arrow: right-pointing (card is on the right) */}
+                              {!isLeft && (
+                                <svg className="absolute right-0 top-1/2 -translate-y-1/2" width="22" height="12" viewBox="0 0 22 12" style={{ marginTop: idx > 0 ? '8px' : '0' }}>
+                                  <line x1="0" y1="6" x2="14" y2="6" stroke={color} strokeWidth="1" strokeDasharray="4 4" className="animate-arrow-flow" style={{ animationDelay: fadeDelay }} />
+                                  <polygon points="20,6 14,2 14,10" fill={color} opacity="0.8" />
+                                </svg>
+                              )}
+                            </div>
+
+                            {/* Right column */}
+                            <div className="flex items-center justify-start overflow-hidden" style={{ minHeight: '120px', paddingTop: idx > 0 ? '16px' : '0' }}>
+                              {!isLeft ? renderWindowCard(entry, color, fadeDelay, shimmerDelay) : null}
+                            </div>
+                          </Fragment>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+
+              return (
+                <div key={i} className="my-4 stagger-fade-in">
+                  <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-4 sm:p-6 backdrop-blur-md card-glow card-accent-border relative overflow-hidden">
+                    {/* Ambient background glow inside the card */}
+                    <div className="absolute -top-12 -right-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
+                    {/* Header */}
+                    <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4 pb-3 sm:pb-4 border-b border-slate-700/50">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/30 flex items-center justify-center">
+                        {getFileIcon()}
+                      </div>
+                      <h3 className="text-lg sm:text-xl font-bold text-emerald-400">{title}</h3>
+                    </div>
+                    
+                    {/* Timeline Tree as sole content */}
+                    <TimelineTreeAnimation />
+                  </div>
+                </div>
+              );
+            }
+
+            // Default card for other file types
+            return (
+              <div key={i} className="my-4 stagger-fade-in">
+                <div className="bg-slate-900/40 border border-slate-800/60 rounded-xl p-4 sm:p-6 backdrop-blur-md card-glow card-accent-border relative overflow-hidden">
+                  {/* Ambient background glow inside the card */}
+                  <div className="absolute -top-12 -right-12 w-28 h-28 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
+                  {/* Header */}
+                  <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4 pb-3 sm:pb-4 border-b border-slate-700/50">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/30 flex items-center justify-center">
+                      {getFileIcon()}
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-bold text-emerald-400">{title}</h3>
+                  </div>
+                  
+                  {/* Content */}
+                  {renderContentSections(sections)}
+                </div>
               </div>
+            );
+          } catch {
+            return <div key={i} className="text-red-400">Error parsing file data</div>;
+          }
+        }
+        
+        // Handle formatted lines with markers (fallback)
+        if (line.startsWith('§HEADER§')) {
+          const content = line.replace('§HEADER§', '');
+          return (
+            <div key={i} className="py-2">
+              <span className="text-emerald-400 font-bold text-base">{content}</span>
+            </div>
+          );
+        } else if (line.startsWith('§SECTION§')) {
+          const content = line.replace('§SECTION§', '');
+          return (
+            <div key={i} className="pt-3 pb-1">
+              <span className="text-cyan-400 font-semibold">{content}</span>
+            </div>
+          );
+        } else if (line.startsWith('§BULLET§')) {
+          const content = line.replace('§BULLET§', '');
+          return (
+            <div key={i} className="whitespace-pre-wrap text-slate-300 pl-2">
+              <span className="text-emerald-500">›</span>
+              <span className="ml-1">{content.replace(/^[•\-]\s*/, '')}</span>
+            </div>
+          );
+        } else if (line.startsWith('§LINK§')) {
+          const content = line.replace('§LINK§', '');
+          return (
+            <div key={i} className="whitespace-pre-wrap text-blue-400 hover:text-blue-300 break-all">
+              {content}
+            </div>
+          );
+        } else if (line.startsWith('§EMOJI§')) {
+          const content = line.replace('§EMOJI§', '');
+          return (
+            <div key={i} className="whitespace-pre-wrap text-slate-200 py-0.5">
+              {content}
+            </div>
+          );
+        } else if (line.startsWith('§DIVIDER§')) {
+          return (
+            <div key={i} className="text-slate-600 py-1">
+              {'─'.repeat(40)}
+            </div>
+          );
+        } else if (line.startsWith('§MARKDOWN_H§')) {
+          const content = line.replace('§MARKDOWN_H§', '').replace(/^#+\s*/, '');
+          return (
+            <div key={i} className="py-2">
+              <span className="text-emerald-300 font-bold text-base">{content}</span>
+            </div>
+          );
+        } else if (line.startsWith('§PROGRESS§')) {
+          const content = line.replace('§PROGRESS§', '');
+          return (
+            <div key={i} className="whitespace-pre-wrap font-mono">
+              <span className="text-slate-400">{content.split(/████/)[0]}</span>
+              <span className="text-emerald-400">{content.match(/█+/)?.[0] || ''}</span>
+              <span className="text-slate-600">{content.match(/░+/)?.[0] || ''}</span>
+              <span className="text-slate-400">{content.split(/[█░]+/).pop() || ''}</span>
+            </div>
+          );
+        } else if (line.startsWith(`${process.env.NEXT_PUBLIC_TERMINAL_USER}@${process.env.NEXT_PUBLIC_TERMINAL_HOST}:`)) {
+          return (
+            <div key={i} className="whitespace-pre-wrap text-emerald-400 break-all">
+              {line}
+            </div>
+          );
+        }
+        return (
+          <div key={i} className="whitespace-pre-wrap text-slate-300">
+            {line}
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  return (
+    <div className="h-full">
+      {/* Mobile file drawer overlay */}
+      {isMobile && (
+        <>
+          <div className={`drawer-backdrop ${drawerOpen ? 'open' : ''}`} onClick={() => setDrawerOpen(false)} />
+          <div className={`drawer-panel ${drawerOpen ? 'open' : ''} flex flex-col green-scroll`}>
+            {/* Drawer header */}
+            <div className="shrink-0 px-3 py-3 border-b border-slate-800/50 bg-slate-900/80">
+              <div className="text-emerald-400 font-semibold text-sm">Explorer</div>
+            </div>
+            {fileTreeContent}
+          </div>
+        </>
+      )}
+
+      {/* Terminal */}
+      <TerminalShell title={`${process.env.NEXT_PUBLIC_TERMINAL_USER}@${process.env.NEXT_PUBLIC_TERMINAL_HOST} — bash`} className="h-full flex flex-col">
+        {isMobile ? (
+          /* Mobile: single column, no sidebar grid */
+          <div className="flex flex-col h-full min-h-0">
+            {/* Mobile files toggle + output area */}
+            <div className="flex-1 overflow-auto green-scroll p-2 sm:p-3 min-h-0" ref={outputRef}>
+              {/* Mobile file toggle button */}
+              <button
+                onClick={() => setDrawerOpen(true)}
+                className="mb-2 flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-slate-800/60 border border-slate-700/50 text-emerald-400 text-xs font-mono hover:bg-slate-700/60 transition-colors"
+              >
+                <Menu size={14} />
+                <span>Files</span>
+              </button>
+              {renderedOutput}
             </div>
 
             {/* Input area - fixed at bottom */}
             <form
               onSubmit={handleSubmit}
-              className="shrink-0 border-t border-slate-800/70 flex items-center gap-2 p-2 bg-slate-950/30"
+              className="shrink-0 border-t border-slate-800/70 flex items-center gap-1 sm:gap-2 p-1.5 sm:p-2 bg-slate-950/30"
             >
-              <span className="text-emerald-400 font-mono shrink-0">
-                {process.env.NEXT_PUBLIC_TERMINAL_USER}@{process.env.NEXT_PUBLIC_TERMINAL_HOST}:{cwd === '/' ? '~' : `~${cwd}`}$
+              <span className="text-emerald-400 font-mono shrink-0 text-xs sm:text-sm">
+                <span className="hidden sm:inline">{process.env.NEXT_PUBLIC_TERMINAL_USER}@{process.env.NEXT_PUBLIC_TERMINAL_HOST}:</span>
+                <span className="sm:hidden">$</span>
+                <span className="hidden sm:inline">{cwd === '/' ? '~' : `~${cwd}`}$</span>
               </span>
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                className="flex-1 bg-transparent outline-none text-slate-200 font-mono placeholder:text-slate-500 caret-emerald-400"
+                className="flex-1 bg-transparent outline-none text-slate-200 font-mono placeholder:text-slate-500 caret-emerald-400 text-xs sm:text-sm"
                 placeholder=""
                 autoComplete="off"
                 autoFocus
               />
             </form>
           </div>
-        </div>
+        ) : (
+          /* Desktop: 3-column grid with sidebar */
+          <div
+            className="grid h-full"
+            style={{
+              gridTemplateColumns: `${panelWidth}px 8px 1fr`,
+            }}
+            onMouseMove={handleMouseMove}
+            onMouseUp={stopResize}
+            onMouseLeave={stopResize}
+          >
+            {/* File tree panel */}
+            <div className="flex flex-col min-h-0 border-r border-slate-800/70 bg-slate-950/30">
+              {fileTreeContent}
+            </div>
+
+            {/* Resize handle */}
+            <div
+              className="cursor-col-resize bg-slate-800/70 hover:bg-slate-700/80 transition-colors"
+              onMouseDown={startResize}
+              title="Drag to resize"
+            />
+
+            {/* Main terminal area */}
+            <div className="flex flex-col min-w-0 min-h-0">
+              {/* Output area */}
+              <div className="flex-1 overflow-auto green-scroll p-3 min-h-0" ref={!isMobile ? outputRef : undefined}>
+                {renderedOutput}
+              </div>
+
+              {/* Input area - fixed at bottom */}
+              <form
+                onSubmit={handleSubmit}
+                className="shrink-0 border-t border-slate-800/70 flex items-center gap-2 p-2 bg-slate-950/30"
+              >
+                <span className="text-emerald-400 font-mono shrink-0">
+                  {process.env.NEXT_PUBLIC_TERMINAL_USER}@{process.env.NEXT_PUBLIC_TERMINAL_HOST}:{cwd === '/' ? '~' : `~${cwd}`}$
+                </span>
+                <input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  className="flex-1 bg-transparent outline-none text-slate-200 font-mono placeholder:text-slate-500 caret-emerald-400"
+                  placeholder=""
+                  autoComplete="off"
+                  autoFocus
+                />
+              </form>
+            </div>
+          </div>
+        )}
       </TerminalShell>
     </div>
   );
-}
-
+}

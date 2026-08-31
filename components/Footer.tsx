@@ -4,22 +4,25 @@ import { useState, useEffect } from 'react';
 import { Clock, MapPin } from 'lucide-react';
 
 export default function Footer() {
-  const [time, setTime] = useState(new Date());
+  const [time, setTime] = useState<Date | null>(null);
 
   useEffect(() => {
+    setTime(new Date());
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
 
-  const formattedTime = new Intl.DateTimeFormat(undefined, {
-    weekday: 'short',
-    year: 'numeric',
-    month: 'short',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  }).format(time);
+  const formattedTime = time
+    ? new Intl.DateTimeFormat(undefined, {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      }).format(time)
+    : '';
 
   return (
     <footer className="shrink-0 relative z-50">
@@ -66,7 +69,7 @@ export default function Footer() {
             <Clock size={16} className="text-emerald-400" />
             <span className="tabular-nums text-sm font-medium hidden sm:inline">{formattedTime}</span>
             <span className="tabular-nums text-sm font-medium sm:hidden">
-              {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              {time ? time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
             </span>
           </div>
         </div>

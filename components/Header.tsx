@@ -20,12 +20,12 @@ export default function Header({ currentView, onExploreProjects, onGoHome }: Hea
       {/* Noise overlay */}
       <div className="noise-texture opacity-[0.03]" />
       
-      <div className="relative w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="relative w-full px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
         {/* Logo/Name */}
         {/* Logo/Name */}
-        <div className="flex items-center gap-3 group cursor-pointer" onClick={onGoHome}>
+        <div className="flex items-center gap-2 sm:gap-3 group cursor-pointer" onClick={onGoHome}>
           {/* Custom S Logo - Geometric Block Design */}
-          <div className="relative w-9 h-9 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+          <div className="relative w-8 h-8 sm:w-9 sm:h-9 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
             <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-lg">
               <defs>
                 <linearGradient id="logoGradientTop" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -65,17 +65,17 @@ export default function Header({ currentView, onExploreProjects, onGoHome }: Hea
           
           {/* Name */}
           <div className="flex flex-col">
-            <span className="text-lg font-bold text-white group-hover:text-emerald-50 transition-colors">
+            <span className="text-sm sm:text-lg font-bold text-white group-hover:text-emerald-50 transition-colors">
               {process.env.NEXT_PUBLIC_NAME}
             </span>
-            <span className="text-xs text-slate-400 hidden sm:block">
+            <span className="text-[10px] sm:text-xs text-slate-400 hidden sm:block">
               {process.env.NEXT_PUBLIC_TITLE}
             </span>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex items-center gap-3">
+        <nav className="flex items-center gap-1.5 sm:gap-3 overflow-hidden">
           {currentView === 'hero' ? (
             <button
               onClick={onExploreProjects}
@@ -88,7 +88,7 @@ export default function Header({ currentView, onExploreProjects, onGoHome }: Hea
               <div className="absolute -inset-0.5 rounded-full bg-emerald-500/20 opacity-0 group-hover:opacity-100 group-hover:animate-ping pointer-events-none" />
             </button>
           ) : (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-3">
               {/* GitHub */}
               <a
                 href={process.env.NEXT_PUBLIC_GITHUB_URL}
@@ -96,7 +96,7 @@ export default function Header({ currentView, onExploreProjects, onGoHome }: Hea
                 rel="noreferrer"
                 className="group relative"
               >
-                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-slate-800/80 to-slate-700/80 border border-slate-600/30 hover:border-slate-500/60 hover:from-slate-700/80 hover:to-slate-600/80 transition-all duration-300 group-hover:scale-105">
+                <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-gradient-to-r from-slate-800/80 to-slate-700/80 border border-slate-600/30 hover:border-slate-500/60 hover:from-slate-700/80 hover:to-slate-600/80 transition-all duration-300 group-hover:scale-105">
                   <Github size={18} className="text-slate-200 group-hover:text-white group-hover:animate-bounce transition-colors" />
                   <span className="hidden sm:inline text-sm font-medium text-slate-200 group-hover:text-white">GitHub</span>
                 </div>
@@ -111,7 +111,7 @@ export default function Header({ currentView, onExploreProjects, onGoHome }: Hea
                 rel="noreferrer"
                 className="group relative"
               >
-                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600/20 to-blue-500/20 border border-blue-500/30 hover:border-blue-400/60 hover:from-blue-600/30 hover:to-blue-500/30 transition-all duration-300 group-hover:scale-105">
+                <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-gradient-to-r from-blue-600/20 to-blue-500/20 border border-blue-500/30 hover:border-blue-400/60 hover:from-blue-600/30 hover:to-blue-500/30 transition-all duration-300 group-hover:scale-105">
                   <Linkedin size={18} className="text-blue-400 group-hover:text-blue-300 group-hover:animate-bounce transition-colors" />
                   <span className="hidden sm:inline text-sm font-medium text-blue-300 group-hover:text-blue-200">LinkedIn</span>
                 </div>
@@ -124,7 +124,7 @@ export default function Header({ currentView, onExploreProjects, onGoHome }: Hea
                 href={`mailto:${process.env.NEXT_PUBLIC_EMAIL}`}
                 className="group relative"
               >
-                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-rose-600/20 to-orange-500/20 border border-rose-500/30 hover:border-rose-400/60 hover:from-rose-600/30 hover:to-orange-500/30 transition-all duration-300 group-hover:scale-105">
+                <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-gradient-to-r from-rose-600/20 to-orange-500/20 border border-rose-500/30 hover:border-rose-400/60 hover:from-rose-600/30 hover:to-orange-500/30 transition-all duration-300 group-hover:scale-105">
                   <Mail size={18} className="text-rose-400 group-hover:text-rose-300 group-hover:animate-bounce transition-colors" />
                   <span className="hidden sm:inline text-sm font-medium text-rose-300 group-hover:text-rose-200">Email</span>
                 </div>
@@ -133,14 +133,14 @@ export default function Header({ currentView, onExploreProjects, onGoHome }: Hea
               </a>
               
               {/* Vertical Divider */}
-              <div className="w-px h-8 bg-gradient-to-b from-transparent via-slate-600 to-transparent mx-1" />
+              <div className="w-px h-8 bg-gradient-to-b from-transparent via-slate-600 to-transparent mx-1 hidden sm:block" />
               
               {/* Home Button */}
               <button
                 onClick={onGoHome}
                 className="group relative"
               >
-                <div className="flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-500 text-white font-semibold shadow-lg shadow-emerald-500/30 group-hover:shadow-emerald-400/50 transition-all duration-300 group-hover:scale-105">
+                <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-500 text-white font-semibold shadow-lg shadow-emerald-500/30 group-hover:shadow-emerald-400/50 transition-all duration-300 group-hover:scale-105">
                   <Home size={16} className="group-hover:animate-bounce transition-transform duration-300" />
                   <span className="hidden sm:inline text-sm">Home</span>
                 </div>

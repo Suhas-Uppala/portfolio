@@ -68,7 +68,7 @@ export default function Hero({ onViewMore }: HeroProps) {
 };`}</pre>
       </motion.div>
 
-      <div className="relative z-10 w-full flex flex-col lg:flex-row items-center justify-between gap-8 p-8 md:p-12">
+      <div className="relative z-10 w-full flex flex-col lg:flex-row items-center justify-between gap-6 sm:gap-8 p-4 sm:p-8 md:p-12">
         {/* Left side - Text content */}
         <motion.div
           className="max-w-2xl"
@@ -76,7 +76,7 @@ export default function Hero({ onViewMore }: HeroProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
             <span className="text-slate-200">{process.env.NEXT_PUBLIC_NAME}</span>
             <br />
             <span className="bg-gradient-to-r from-emerald-400 via-emerald-300 to-cyan-400 bg-clip-text text-transparent">
@@ -90,17 +90,23 @@ export default function Hero({ onViewMore }: HeroProps) {
           </h1>
 
           <motion.p
-            className="mt-4 text-slate-300/90 text-lg md:text-xl"
+            className="mt-3 sm:mt-4 text-slate-300/90 text-sm sm:text-lg md:text-xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.6 }}
           >
-            {process.env.NEXT_PUBLIC_LOCATION} — {process.env.NEXT_PUBLIC_PHONE} · {process.env.NEXT_PUBLIC_EMAIL}
+            <span className="hidden sm:inline">
+              {process.env.NEXT_PUBLIC_LOCATION} — {process.env.NEXT_PUBLIC_PHONE} · {process.env.NEXT_PUBLIC_EMAIL}
+            </span>
+            <span className="sm:hidden flex flex-col gap-0.5">
+              <span>{process.env.NEXT_PUBLIC_LOCATION}</span>
+              <span className="text-slate-400">{process.env.NEXT_PUBLIC_EMAIL}</span>
+            </span>
           </motion.p>
 
           {/* Achievement badges */}
           <motion.div
-            className="mt-5 flex flex-wrap gap-2"
+            className="mt-4 sm:mt-5 flex flex-wrap gap-1.5 sm:gap-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5, duration: 0.6 }}
@@ -108,7 +114,7 @@ export default function Hero({ onViewMore }: HeroProps) {
             {achievements.map((badge, idx) => (
               <motion.span
                 key={idx}
-                className="badge-pulse inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border backdrop-blur-sm"
+                className="badge-pulse inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium border backdrop-blur-sm"
                 style={{
                   background: 'rgba(16, 185, 129, 0.06)',
                   borderColor: 'rgba(16, 185, 129, 0.2)',
@@ -126,14 +132,14 @@ export default function Hero({ onViewMore }: HeroProps) {
           </motion.div>
 
           <motion.div
-            className="mt-6 flex flex-wrap gap-3"
+            className="mt-5 sm:mt-6 flex flex-wrap gap-2 sm:gap-3"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
             <button
               onClick={onViewMore}
-              className="btn-glow px-6 py-2.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-medium transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/20"
+              className="btn-glow px-5 sm:px-6 py-2 sm:py-2.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-medium transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/20 text-sm sm:text-base"
             >
               Explore
             </button>
@@ -141,7 +147,7 @@ export default function Hero({ onViewMore }: HeroProps) {
               href={process.env.NEXT_PUBLIC_RESUME_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-2.5 rounded-md border border-slate-700/70 hover:border-emerald-500/40 text-slate-200 hover:text-white transition-all duration-300 hover:bg-emerald-500/5"
+              className="px-5 sm:px-6 py-2 sm:py-2.5 rounded-md border border-slate-700/70 hover:border-emerald-500/40 text-slate-200 hover:text-white transition-all duration-300 hover:bg-emerald-500/5 text-sm sm:text-base"
             >
               Resume
             </a>
@@ -150,12 +156,17 @@ export default function Hero({ onViewMore }: HeroProps) {
 
         {/* Right side - Interactive Globe */}
         <motion.div
-          className="hidden md:flex items-center justify-center"
+          className="hidden sm:flex items-center justify-center"
           initial={{ opacity: 0, scale: 0.8, x: 50 }}
           animate={{ opacity: 1, scale: 1, x: 0 }}
           transition={{ delay: 0.4, duration: 0.8, ease: 'easeOut' }}
         >
-          <Globe size={280} />
+          <div className="hidden lg:block">
+            <Globe size={280} />
+          </div>
+          <div className="block lg:hidden">
+            <Globe size={200} />
+          </div>
         </motion.div>
       </div>
     </section>

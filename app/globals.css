@@ -631,6 +631,70 @@ body {
 }
 
 /* ═══════════════════════════════════════════
+   Mobile drawer overlay
+   ═══════════════════════════════════════════ */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 40;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.drawer-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drawer-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  max-width: 80vw;
+  background: rgba(10, 15, 26, 0.97);
+  border-right: 1px solid rgba(51, 65, 85, 0.5);
+  z-index: 50;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+}
+
+.drawer-panel.open {
+  transform: translateX(0);
+}
+
+/* ═══════════════════════════════════════════
+   Responsive: Mobile (< 640px)
+   ═══════════════════════════════════════════ */
+@media (max-width: 639px) {
+  .terminal-text,
+  .font-mono {
+    font-size: 12px;
+  }
+
+  .corner-bracket {
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Responsive: Tablet (640px–1024px)
+   ═══════════════════════════════════════════ */
+@media (min-width: 640px) and (max-width: 1024px) {
+  .corner-bracket {
+    width: 56px !important;
+    height: 56px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════
    Reduced motion
    ═══════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
