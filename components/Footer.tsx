@@ -45,7 +45,7 @@ export default function Footer() {
         </div>
 
         {/* Right side - Status, Location, Time */}
-        <div className="flex items-center gap-4 sm:gap-6">
+        <div className="flex items-center gap-3 sm:gap-6">
           {/* Live indicator */}
           <div className="flex items-center gap-2">
             <span className="relative flex h-2.5 w-2.5">
