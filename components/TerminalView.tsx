@@ -18,86 +18,6 @@ function useIsMobile(breakpoint = 768) {
   return isMobile;
 }
 
-// Tech icon mapping
-const techIcons: { [key: string]: { icon: React.ReactNode; color: string } } = {
-  'python': { icon: <Code size={20} />, color: '#3776AB' },
-  'tensorflow': { icon: <Brain size={20} />, color: '#FF6F00' },
-  'pytorch': { icon: <Zap size={20} />, color: '#EE4C2C' },
-  'scikit-learn': { icon: <BarChart3 size={20} />, color: '#F7931E' },
-  'flask': { icon: <Server size={20} />, color: '#000000' },
-  'fastapi': { icon: <Zap size={20} />, color: '#009688' },
-  'react': { icon: <Code size={20} />, color: '#61DAFB' },
-  'react.js': { icon: <Code size={20} />, color: '#61DAFB' },
-  'next.js': { icon: <Globe size={20} />, color: '#000000' },
-  'node.js': { icon: <Server size={20} />, color: '#339933' },
-  'express.js': { icon: <Server size={20} />, color: '#000000' },
-  'mongodb': { icon: <Database size={20} />, color: '#47A248' },
-  'postgresql': { icon: <Database size={20} />, color: '#4169E1' },
-  'mysql': { icon: <Database size={20} />, color: '#4479A1' },
-  'sql': { icon: <Database size={20} />, color: '#336791' },
-  'docker': { icon: <Box size={20} />, color: '#2496ED' },
-  'flutter': { icon: <Smartphone size={20} />, color: '#02569B' },
-  'opencv': { icon: <Globe size={20} />, color: '#5C3EE8' },
-  'ultralytics': { icon: <Cpu size={20} />, color: '#0080FF' },
-  'yolov8': { icon: <Cpu size={20} />, color: '#FF6F61' },
-  'yolov11': { icon: <Cpu size={20} />, color: '#FF6F61' },
-  'jetson': { icon: <Cpu size={20} />, color: '#76B900' },
-  'xgboost': { icon: <Zap size={20} />, color: '#FF4500' },
-  'twilio': { icon: <MessageSquare size={20} />, color: '#F22F46' },
-  'langchain': { icon: <Layers size={20} />, color: '#1C3C3C' },
-  'gemini': { icon: <Brain size={20} />, color: '#8E75B2' },
-  'rag': { icon: <Brain size={20} />, color: '#10B981' },
-  'genai': { icon: <Brain size={20} />, color: '#8B5CF6' },
-  'gen ai': { icon: <Brain size={20} />, color: '#8B5CF6' },
-  'mern': { icon: <Layers size={20} />, color: '#00D8FF' },
-  'streamlit': { icon: <Globe size={20} />, color: '#FF4B4B' },
-  'aws': { icon: <Cloud size={20} />, color: '#FF9900' },
-  'gcp': { icon: <Cloud size={20} />, color: '#4285F4' },
-  'google cloud vision': { icon: <Cloud size={20} />, color: '#4285F4' },
-  'random forest': { icon: <BarChart3 size={20} />, color: '#228B22' },
-  'kmeans': { icon: <BarChart3 size={20} />, color: '#9370DB' },
-  'google maps': { icon: <Globe size={20} />, color: '#4285F4' },
-  'geolocator': { icon: <Globe size={20} />, color: '#34A853' },
-  'yolo': { icon: <Cpu size={20} />, color: '#FF6F61' },
-  'nlp': { icon: <MessageSquare size={20} />, color: '#6366F1' },
-};
-
-
-const TechIcon = ({ tech }: { tech: string }) => {
-  const techLower = tech.toLowerCase().trim();
-  const techInfo = Object.entries(techIcons).find(([key]) => techLower.includes(key));
-  
-  if (techInfo) {
-    const [, { icon, color }] = techInfo;
-    return (
-      <div 
-        className="group relative flex items-center justify-center w-10 h-10 rounded-lg bg-slate-700/50 border border-slate-600/30 hover:border-slate-500/50 transition-all cursor-pointer"
-        style={{ color }}
-        title={tech}
-      >
-        {icon}
-        {/* Tooltip */}
-        <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-slate-200 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-          {tech}
-        </span>
-      </div>
-    );
-  }
-  
-  // Fallback for unknown techs
-  return (
-    <div 
-      className="group relative flex items-center justify-center w-10 h-10 rounded-lg bg-slate-700/50 border border-slate-600/30 hover:border-slate-500/50 transition-all cursor-pointer text-slate-400"
-      title={tech}
-    >
-      <Code size={20} />
-      <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-slate-200 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-        {tech}
-      </span>
-    </div>
-  );
-};
-
 interface TerminalViewProps {
   onGoHome: () => void;
 }
@@ -574,12 +494,25 @@ export default function TerminalView({ onGoHome }: TerminalViewProps) {
                   
                   {/* Technologies */}
                   {sections.technologies?.length > 0 && (
-                    <div className="mb-3 sm:mb-4">
-                      <h4 className="text-cyan-400 font-semibold text-xs sm:text-sm mb-2 sm:mb-3">Technologies</h4>
-                      <div className="flex flex-wrap gap-2 sm:gap-3">
-                        {sections.technologies.map((tech, idx) => (
-                          <TechIcon key={idx} tech={tech} />
-                        ))}
+                    <div className="mb-3 sm:mb-4 bg-slate-950/45 rounded-lg border border-slate-800/70 p-3 sm:p-4 hover:border-slate-700/50 transition-colors">
+                      <h4 className="text-cyan-400 font-semibold text-[10px] sm:text-xs uppercase tracking-wider mb-2 sm:mb-3 flex items-center gap-1.5 font-mono">
+                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block animate-pulse" />
+                        Technologies
+                      </h4>
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                        {sections.technologies
+                          .flatMap((techStr) => techStr.split(','))
+                          .map((t) => t.replace(/^[•\-]\s*/, '').trim())
+                          .filter(Boolean)
+                          .map((tech, idx) => (
+                            <div 
+                              key={idx} 
+                              className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded bg-slate-900/60 border border-slate-800/80 hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all text-slate-300 hover:text-emerald-300 text-[10px] sm:text-xs font-mono flex items-center gap-1 sm:gap-1.5 hover:scale-[1.03] cursor-default"
+                            >
+                              <span className="w-1 h-1 rounded-full bg-emerald-500/60" />
+                              {tech}
+                            </div>
+                          ))}
                       </div>
                     </div>
                   )}
